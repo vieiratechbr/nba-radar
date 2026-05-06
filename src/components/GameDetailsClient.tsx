@@ -6,16 +6,20 @@ import {
   ArrowLeft,
   BarChart3,
   Clock,
+  ExternalLink,
   ListOrdered,
   MapPin,
+  Play,
   RefreshCw,
   Trophy,
   Users
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { GameExtras, LastFiveGame, TeamRecentForm } from "@/types/gameExtras";
 import type { GameDetails, PlayerBoxScore } from "@/types/gameDetails";
+import type { GameHighlight } from "@/types/highlight";
 import { StatusBadge } from "@/components/StatusBadge";
-import { getGameDetails } from "@/services/gamesService";
+import { getGameDetails, getGameExtras } from "@/services/gamesService";
 import { formatDate } from "@/utils/formatDate";
 import { formatGameDateTimeBrasilia, isUnavailableGameTime } from "@/utils/formatGameTime";
 
@@ -71,9 +75,86 @@ function playerValue(player: PlayerBoxScore, key: keyof PlayerBoxScore) {
   return value === undefined || value === "" ? "-" : value;
 }
 
+function probabilityValue(value?: number) {
+  return typeof value === "number" ? `${value.toFixed(1).replace(".", ",")}%` : "-";
+}
+
+function highlightsEmptyMessage(status: GameDetails["status"]) {
+  if (status === "live") return "Melhores momentos serão exibidos após o fim da partida.";
+  if (status === "scheduled") return "Melhores momentos ficarão disponíveis após o jogo.";
+  return "Melhores momentos ainda não disponíveis.";
+}
+
+function HighlightCard({ highlight }: { highlight: GameHighlight }) {
+  return (
+    <a
+      href={highlight.embedUrl ?? highlight.videoUrl}
+      target="_blank"
+      rel="noreferrer"
+      className="group overflow-hidden rounded-md border border-white/10 bg-black/20 transition hover:border-court-red/60 hover:bg-black/35"
+    >
+      <div className="relative aspect-video bg-court-black">
+        {highlight.thumbnailUrl ? (
+          <Image
+            src={highlight.thumbnailUrl}
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 33vw, 100vw"
+            className="object-cover opacity-90 transition group-hover:opacity-100"
+          />
+        ) : (
+          <div className="grid h-full place-items-center bg-[radial-gradient(circle_at_top,rgba(215,25,32,0.28),transparent_45%),#101116]">
+            <Play className="h-9 w-9 text-court-red" aria-hidden="true" />
+          </div>
+        )}
+        <span className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full bg-black/75 px-3 py-1 text-xs font-black text-white">
+          <Play className="h-3.5 w-3.5 text-court-red" aria-hidden="true" />
+          Assistir
+        </span>
+      </div>
+      <div className="p-4">
+        <p className="text-sm font-black text-white">{highlight.title}</p>
+        {highlight.description ? (
+          <p className="mt-2 line-clamp-2 text-xs leading-5 text-zinc-400">{highlight.description}</p>
+        ) : null}
+        <span className="mt-3 inline-flex items-center gap-2 text-xs font-bold text-court-red">
+          Abrir vídeo
+          <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+        </span>
+      </div>
+    </a>
+  );
+}
+
+function RecentForm({ form }: { form: TeamRecentForm }) {
+  return (
+    <div className="rounded-md border border-white/10 bg-black/20 p-4">
+      <p className="mb-3 text-sm font-black text-white">{form.teamName}</p>
+      <div className="grid gap-2">
+        {form.games.map((game: LastFiveGame) => (
+          <div key={game.id} className="flex items-center justify-between gap-3 text-xs text-zinc-400">
+            <span className="min-w-0 truncate">
+              {game.homeAway === "home" ? "Casa" : "Fora"} vs {game.opponent}
+            </span>
+            <span className={`rounded-full px-2 py-1 font-black ${
+              game.result === "W" ? "bg-emerald-400/10 text-emerald-200" :
+                game.result === "L" ? "bg-court-red/10 text-red-200" : "bg-white/10 text-zinc-300"
+            }`}
+            >
+              {game.result ?? "-"} {game.score ? `· ${game.score}` : ""}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
   const [details, setDetails] = useState<GameDetails | null>(null);
+  const [extras, setExtras] = useState<GameExtras | null>(null);
   const [loading, setLoading] = useState(true);
+  const [extrasLoading, setExtrasLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -96,6 +177,26 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
       setRefreshing(false);
     }
   }, [fetchDetails]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadExtras() {
+      setExtrasLoading(true);
+      const data = await getGameExtras(gameId);
+
+      if (!cancelled) {
+        setExtras(data);
+        setExtrasLoading(false);
+      }
+    }
+
+    void loadExtras();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [gameId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -165,6 +266,10 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
   const hasLeaders = Boolean(details.leaders?.length);
   const hasTeamStats = Boolean(details.teamStats?.some((group) => group.stats.length));
   const hasPlayerStats = Boolean(details.playerStats?.length);
+  const highlights = extras?.highlights ?? [];
+  const prediction = extras?.prediction;
+  const headToHead = extras?.headToHead;
+  const hasRecentForm = Boolean(extras?.recentForm.home || extras?.recentForm.visitor);
   const scheduledDateTime = formatGameDateTimeBrasilia(details.date);
   const scheduledStartLabel = isUnavailableGameTime(scheduledDateTime)
     ? scheduledDateTime
@@ -335,6 +440,88 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
           )}
         </div>
       </section>
+
+      <section className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
+        <div className="mb-4 flex items-center gap-2">
+          <Play className="h-5 w-5 text-court-red" aria-hidden="true" />
+          <h2 className="text-xl font-black text-white">Melhores momentos</h2>
+        </div>
+        {extrasLoading ? (
+          <EmptyState>Buscando dados complementares da Highlightly...</EmptyState>
+        ) : highlights.length ? (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {highlights.slice(0, 6).map((highlight) => (
+              <HighlightCard key={highlight.id} highlight={highlight} />
+            ))}
+          </div>
+        ) : (
+          <EmptyState>{highlightsEmptyMessage(details.status)}</EmptyState>
+        )}
+      </section>
+
+      {prediction || headToHead?.lastMeetings?.length || hasRecentForm ? (
+        <section className="grid gap-6 lg:grid-cols-3">
+          {prediction ? (
+            <div className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
+              <div className="mb-4 flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-court-red" aria-hidden="true" />
+                <h2 className="text-xl font-black text-white">Previsão</h2>
+              </div>
+              <div className="grid gap-3 text-sm">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-zinc-400">{details.homeTeam.abbreviation}</span>
+                  <span className="font-black text-white">{probabilityValue(prediction.homeWinProbability)}</span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-zinc-400">{details.visitorTeam.abbreviation}</span>
+                  <span className="font-black text-white">{probabilityValue(prediction.visitorWinProbability)}</span>
+                </div>
+                {prediction.drawProbability ? (
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-zinc-400">Empate</span>
+                    <span className="font-black text-white">{probabilityValue(prediction.drawProbability)}</span>
+                  </div>
+                ) : null}
+              </div>
+              {prediction.summary ? (
+                <p className="mt-4 text-sm leading-6 text-zinc-400">{prediction.summary}</p>
+              ) : null}
+            </div>
+          ) : null}
+
+          {headToHead?.lastMeetings?.length ? (
+            <div className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
+              <div className="mb-4 flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-court-red" aria-hidden="true" />
+                <h2 className="text-xl font-black text-white">Confronto direto</h2>
+              </div>
+              <div className="grid gap-2">
+                {headToHead.lastMeetings.slice(0, 5).map((meeting) => (
+                  <div key={meeting.id} className="rounded-md border border-white/10 bg-black/20 p-3 text-xs text-zinc-400">
+                    <p className="font-bold text-white">
+                      {meeting.visitorTeam} {meeting.visitorScore ?? "-"} x {meeting.homeScore ?? "-"} {meeting.homeTeam}
+                    </p>
+                    <p className="mt-1">{meeting.date ? formatDate(meeting.date) : "Data indisponível"}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {hasRecentForm ? (
+            <div className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
+              <div className="mb-4 flex items-center gap-2">
+                <Clock className="h-5 w-5 text-court-red" aria-hidden="true" />
+                <h2 className="text-xl font-black text-white">Últimos 5 jogos</h2>
+              </div>
+              <div className="grid gap-3">
+                {extras?.recentForm.visitor ? <RecentForm form={extras.recentForm.visitor} /> : null}
+                {extras?.recentForm.home ? <RecentForm form={extras.recentForm.home} /> : null}
+              </div>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       <section className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
         <div className="mb-4 flex items-center gap-2">

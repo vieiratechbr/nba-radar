@@ -2,6 +2,7 @@ import { mockGames } from "@/data/mockGames";
 import { mockTeams } from "@/data/mockTeams";
 import type { Game } from "@/types/game";
 import type { GameDetails } from "@/types/gameDetails";
+import type { GameExtras } from "@/types/gameExtras";
 import type { ServiceResult } from "@/types/service";
 import { getTeams as getTeamsResult } from "@/services/teamsService";
 
@@ -31,7 +32,25 @@ type GameDetailsApiPayload = {
   };
 };
 
+type GameExtrasApiPayload = {
+  data?: GameExtras;
+  fallback?: boolean;
+  source?: "highlightly" | "none";
+  message?: string;
+};
+
 const fallbackMessage = "Não foi possível carregar dados reais. Exibindo demonstração.";
+
+const emptyGameExtras: GameExtras = {
+  highlights: [],
+  prediction: null,
+  headToHead: null,
+  recentForm: {
+    home: null,
+    visitor: null
+  },
+  source: "none"
+};
 
 async function fetchInternalGames(path: string): Promise<ServiceResult<Game[]>> {
   if (typeof window === "undefined") {
@@ -110,6 +129,23 @@ export async function getGameDetails(id: string): Promise<GameDetails> {
 
 export async function getGameSummary(id: string) {
   return getGameDetails(id);
+}
+
+export async function getGameExtras(id: string): Promise<GameExtras> {
+  try {
+    const response = await fetch(`/api/games/${encodeURIComponent(id)}/extras`, { cache: "no-store" });
+    const payload = (await response.json()) as GameExtrasApiPayload;
+
+    return payload.data ?? {
+      ...emptyGameExtras,
+      message: payload.message
+    };
+  } catch {
+    return {
+      ...emptyGameExtras,
+      message: "Dados complementares indisponíveis agora."
+    };
+  }
 }
 
 export async function getGamesByDate(date: string): Promise<Game[]> {
