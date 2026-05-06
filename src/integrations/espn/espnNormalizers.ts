@@ -9,6 +9,7 @@ import type {
 import type { NewsArticle } from "@/types/news";
 import type { StandingTeam } from "@/types/standing";
 import type { Team } from "@/types/team";
+import { formatGameTimeBrasilia } from "@/utils/formatGameTime";
 import { translatePlayText } from "@/utils/translatePlayText";
 
 type UnknownRecord = Record<string, unknown>;
@@ -152,14 +153,17 @@ export function normalizeEspnGame(event: unknown): Game {
   const visitorTeam = normalizeTeamSide(away, "Away");
   const date = readString(rawEvent, ["date"], new Date().toISOString());
   const statusType = readRecord(status, ["type"]);
+  const gameStatus = normalizeStatus(status);
 
   return {
     id: readString(rawEvent, ["id", "uid"], `${homeTeam.abbreviation}-${visitorTeam.abbreviation}-${date}`),
     date,
-    status: normalizeStatus(status),
+    status: gameStatus,
     period: readNumber(status, ["period"], 0) || undefined,
     clock: readString(status, ["displayClock"], undefined),
-    time: readString(statusType, ["shortDetail", "detail"], undefined),
+    time: gameStatus === "scheduled"
+      ? formatGameTimeBrasilia(date)
+      : readString(statusType, ["shortDetail", "detail"], undefined),
     homeTeam,
     visitorTeam,
     arena: readString(venue, ["fullName"], undefined),

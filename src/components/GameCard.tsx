@@ -5,6 +5,7 @@ import type { Team } from "@/types/team";
 import { StatusBadge } from "@/components/StatusBadge";
 import { TeamBadge } from "@/components/TeamBadge";
 import { formatShortDate } from "@/utils/formatDate";
+import { formatGameTimeBrasilia, isUnavailableGameTime } from "@/utils/formatGameTime";
 
 interface GameCardProps {
   game: Game;
@@ -39,8 +40,11 @@ export function GameCard({ game, teams, compact = false }: GameCardProps) {
   const homeScore = game.homeTeam?.score ?? game.homeScore;
   const awayScore = game.visitorTeam?.score ?? game.awayScore;
   const hasScore = typeof homeScore === "number" && typeof awayScore === "number";
+  const scheduledTime = game.time ?? formatGameTimeBrasilia(game.date);
   const periodLabel =
-    typeof game.period === "number"
+    game.status === "scheduled"
+      ? `Agendado · ${scheduledTime}${isUnavailableGameTime(scheduledTime) ? "" : " BRT"}`
+      : typeof game.period === "number"
       ? `${game.period}º quarto`
       : game.period ?? game.clock ?? game.time ?? "Horário indefinido";
   const location = [game.arena ?? "Arena não informada", game.city].filter(Boolean).join(", ");

@@ -17,6 +17,7 @@ import type { GameDetails, PlayerBoxScore } from "@/types/gameDetails";
 import { StatusBadge } from "@/components/StatusBadge";
 import { getGameDetails } from "@/services/gamesService";
 import { formatDate } from "@/utils/formatDate";
+import { formatGameDateTimeBrasilia, isUnavailableGameTime } from "@/utils/formatGameTime";
 
 interface GameDetailsClientProps {
   gameId: string;
@@ -164,6 +165,10 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
   const hasLeaders = Boolean(details.leaders?.length);
   const hasTeamStats = Boolean(details.teamStats?.some((group) => group.stats.length));
   const hasPlayerStats = Boolean(details.playerStats?.length);
+  const scheduledDateTime = formatGameDateTimeBrasilia(details.date);
+  const scheduledStartLabel = isUnavailableGameTime(scheduledDateTime)
+    ? scheduledDateTime
+    : `Início: ${scheduledDateTime} BRT`;
 
   return (
     <div className="grid gap-8">
@@ -195,7 +200,9 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
                 AO VIVO
               </span>
             ) : null}
-            <span className="text-sm font-semibold text-zinc-400">{statusText[details.status]}</span>
+            <span className="text-sm font-semibold text-zinc-400">
+              {details.status === "scheduled" ? scheduledStartLabel : statusText[details.status]}
+            </span>
           </div>
 
           <div className="grid gap-6 lg:grid-cols-[1fr_auto_1fr] lg:items-center">
@@ -208,7 +215,9 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
                 <span className="text-5xl font-black text-white">{total?.home ?? "-"}</span>
               </div>
               <p className="mt-3 text-sm font-semibold text-zinc-400">
-                {details.period ? `${details.period}º quarto` : details.clock ? "Em andamento" : statusText[details.status]}
+                {details.status === "scheduled"
+                  ? scheduledStartLabel
+                  : details.period ? `${details.period}º quarto` : details.clock ? "Em andamento" : statusText[details.status]}
                 {details.clock ? ` · ${details.clock}` : ""}
               </p>
             </div>
@@ -222,7 +231,7 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-court-red" aria-hidden="true" />
-              <span>{formatDate(details.date)}</span>
+              <span>{details.status === "scheduled" ? scheduledStartLabel : formatDate(details.date)}</span>
             </div>
             <div className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4 text-court-red" aria-hidden="true" />
