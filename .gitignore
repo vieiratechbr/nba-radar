@@ -2,8 +2,10 @@ node_modules
 .next
 out
 dist
+build
 coverage
 .env
+.env.local
 .env.example    
 .env*.local
 npm-debug.log*

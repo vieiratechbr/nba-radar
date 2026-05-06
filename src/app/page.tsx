@@ -37,7 +37,7 @@ const quickLinks = [
 
 export default async function HomePage() {
   const topStandings = mockStandings.slice(0, 4);
-  const awardHighlights = mockAwards.filter((award) => award.season === "2023-24").slice(0, 4);
+  const awardHighlights = mockAwards.filter((award) => award.season === "2024-25").slice(0, 4);
   const draftWatch = mockDraftProspects.slice(0, 5);
 
   return (
@@ -131,7 +131,7 @@ export default async function HomePage() {
               {awardHighlights.map((award) => (
                 <div key={award.id} className="rounded-md border border-white/10 bg-black/25 p-4">
                   <p className="text-xs font-black uppercase tracking-[0.16em] text-court-red">{award.award}</p>
-                  <p className="mt-2 text-lg font-black text-white">{award.playerName}</p>
+                  <p className="mt-2 text-lg font-black text-white">{award.playerName ?? "A definir"}</p>
                   <p className="text-sm text-zinc-400">{award.team}</p>
                 </div>
               ))}

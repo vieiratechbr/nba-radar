@@ -1,9 +1,40 @@
 "use client";
 
+import Image from "next/image";
 import { Target } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { DraftProspect } from "@/types/draft";
 import { getDraftProspects } from "@/services/draftService";
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+function ProspectAvatar({ prospect }: { prospect: DraftProspect }) {
+  if (prospect.imageUrl) {
+    return (
+      <Image
+        src={prospect.imageUrl}
+        alt={prospect.playerName}
+        width={64}
+        height={64}
+        className="h-14 w-14 rounded-full border border-white/15 object-cover"
+      />
+    );
+  }
+
+  return (
+    <div className="grid h-14 w-14 place-items-center rounded-full border border-court-red/40 bg-[radial-gradient(circle_at_top,rgba(215,25,32,0.34),rgba(14,15,20,0.96))] text-sm font-black text-white shadow-lg">
+      {getInitials(prospect.playerName)}
+    </div>
+  );
+}
 
 export function DraftClient() {
   const [prospects, setProspects] = useState<DraftProspect[]>([]);
@@ -21,7 +52,7 @@ export function DraftClient() {
       if (cancelled) return;
 
       setProspects(result.data);
-      setMessage(result.message ?? "Prospectos usando base local inicial.");
+      setMessage("Base local inicial de prospectos. Ranking sujeito a mudanças.");
       setLoading(false);
     }
 
@@ -33,7 +64,7 @@ export function DraftClient() {
   }, []);
 
   const years = useMemo(
-    () => ["Todos", ...Array.from(new Set(prospects.map((prospect) => prospect.year)))],
+    () => ["Todos", ...Array.from(new Set(prospects.map((prospect) => prospect.year))).sort((a, b) => b.localeCompare(a))],
     [prospects]
   );
   const positions = useMemo(
@@ -112,8 +143,11 @@ export function DraftClient() {
             className="rounded-lg border border-white/10 bg-court-slate/82 p-5 shadow-lg transition hover:-translate-y-1 hover:border-court-red/60 hover:bg-[#1d2029] hover:shadow-glow"
           >
             <div className="mb-5 flex items-start justify-between gap-3">
-              <div className="grid h-12 w-12 place-items-center rounded-md bg-court-red text-lg font-black text-white">
-                #{prospect.rank}
+              <div className="flex items-center gap-3">
+                <ProspectAvatar prospect={prospect} />
+                <div className="grid h-12 w-12 place-items-center rounded-md bg-court-red text-lg font-black text-white">
+                  #{prospect.rank}
+                </div>
               </div>
               <span className="rounded-full border border-white/10 px-3 py-1 text-xs font-bold text-zinc-300">
                 Pick {prospect.projectedPick ?? "-"}
