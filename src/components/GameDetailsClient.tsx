@@ -43,10 +43,10 @@ function TeamPanel({ team, align = "left" }: { team: GameDetails["homeTeam"]; al
         {team.logoUrl ? (
           <Image
             src={team.logoUrl}
-            alt=""
+            alt={team.fullName}
             width={52}
             height={52}
-            className="h-12 w-12 rounded-md object-contain"
+            className="h-12 w-12 rounded-md border border-white/15 bg-white/95 p-1 object-contain"
           />
         ) : (
           <div className="grid h-12 w-12 place-items-center rounded-md bg-court-red text-sm font-black text-white">

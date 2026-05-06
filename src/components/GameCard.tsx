@@ -54,7 +54,14 @@ export function GameCard({ game, teams, compact = false }: GameCardProps) {
       return {
         ...knownTeam,
         name: snapshot.name || knownTeam.name,
-        city: snapshot.fullName.replace(snapshot.name, "").trim() || knownTeam.city
+        city: snapshot.fullName.replace(snapshot.name, "").trim() || knownTeam.city,
+        fullName: snapshot.fullName || knownTeam.fullName,
+        abbreviation: snapshot.abbreviation || knownTeam.abbreviation,
+        logoUrl: snapshot.logoUrl ?? knownTeam.logoUrl,
+        colors: {
+          primary: snapshot.color ? `#${snapshot.color.replace("#", "")}` : knownTeam.colors?.primary ?? "#d71920",
+          secondary: knownTeam.colors?.secondary ?? "#2a2d37"
+        }
       };
     }
 
@@ -62,11 +69,16 @@ export function GameCard({ game, teams, compact = false }: GameCardProps) {
       id: String(snapshot.id ?? snapshot.abbreviation),
       city: snapshot.fullName.replace(snapshot.name, "").trim() || snapshot.fullName,
       name: snapshot.name,
+      fullName: snapshot.fullName,
       abbreviation: snapshot.abbreviation,
+      logoUrl: snapshot.logoUrl,
       conference: "East",
       record: "-",
       seed: 0,
-      colors: { primary: "#d71920", secondary: "#2a2d37" }
+      colors: {
+        primary: snapshot.color ? `#${snapshot.color.replace("#", "")}` : "#d71920",
+        secondary: "#2a2d37"
+      }
     };
   }
 

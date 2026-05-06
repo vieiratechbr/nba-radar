@@ -68,6 +68,7 @@ export type GamePlay = {
   clock?: string;
   team?: string;
   text: string;
+  originalText?: string;
   score?: string;
   type?: string;
 };

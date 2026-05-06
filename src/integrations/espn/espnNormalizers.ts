@@ -9,6 +9,7 @@ import type {
 import type { NewsArticle } from "@/types/news";
 import type { StandingTeam } from "@/types/standing";
 import type { Team } from "@/types/team";
+import { translatePlayText } from "@/utils/translatePlayText";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -347,12 +348,15 @@ function normalizePlays(
       const hasScore = Number.isFinite(homeScore) && Number.isFinite(awayScore);
       const playType = readRecord(play, ["type"]);
 
+      const originalText = readString(play, ["text", "shortDescription"], "Lance da partida");
+
       return {
         id: readString(play, ["id"], `play-${index}`),
         period: readNumber(period, ["number"], 0) || undefined,
         clock: readString(clock, ["displayValue"], undefined),
         team: readString(team, ["abbreviation", "displayName"], undefined),
-        text: readString(play, ["text", "shortDescription"], "Lance da partida"),
+        text: translatePlayText(originalText) || originalText,
+        originalText,
         score: hasScore
           ? `${homeTeam.abbreviation} ${homeScore} - ${visitorTeam.abbreviation} ${awayScore}`
           : undefined,
