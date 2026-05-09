@@ -7,6 +7,7 @@ import { BarChart3, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { clsx } from "clsx";
 import { LayoutWrapper } from "@/components/LayoutWrapper";
+import { UserMenu } from "@/components/auth/UserMenu";
 
 const navItems = [
   { href: "/", label: "Início" },
@@ -74,6 +75,7 @@ export function Header() {
             <BarChart3 className="h-4 w-4" aria-hidden="true" />
             Ver jogos de hoje
           </Link>
+          <UserMenu />
         </div>
 
         <button
@@ -108,6 +110,9 @@ export function Header() {
                 <BarChart3 className="h-4 w-4" aria-hidden="true" />
                 Ver jogos de hoje
               </Link>
+              <div className="mt-2 border-t border-white/10 pt-4">
+                <UserMenu mobile />
+              </div>
             </nav>
           </LayoutWrapper>
         </div>

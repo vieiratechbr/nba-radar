@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, BarChart3, Medal, Table2, Target } from "lucide-react";
+import { FavoriteTeamCard } from "@/components/favorite-team/FavoriteTeamCard";
 import { HeroSection } from "@/components/HeroSection";
 import { LayoutWrapper } from "@/components/LayoutWrapper";
 import { ScoreboardSection } from "@/components/ScoreboardSection";
@@ -7,6 +8,10 @@ import { SectionTitle } from "@/components/SectionTitle";
 import { mockAwards } from "@/data/mockAwards";
 import { mockDraftProspects } from "@/data/mockDraftProspects";
 import { mockStandings } from "@/data/mockStandings";
+import { getFavoriteTeamDashboard } from "@/services/favoriteTeamService";
+import { getCurrentProfile } from "@/services/profileService";
+
+export const dynamic = "force-dynamic";
 
 const quickLinks = [
   {
@@ -39,12 +44,18 @@ export default async function HomePage() {
   const topStandings = mockStandings.slice(0, 4);
   const awardHighlights = mockAwards.filter((award) => award.season === "2024-25").slice(0, 4);
   const draftWatch = mockDraftProspects.slice(0, 5);
+  const { profile } = await getCurrentProfile();
+  const favoriteDashboard = profile?.favorite_team_id
+    ? await getFavoriteTeamDashboard(profile).catch(() => null)
+    : null;
 
   return (
     <>
       <HeroSection />
 
       <LayoutWrapper className="grid gap-16 py-12 sm:py-16">
+        {favoriteDashboard ? <FavoriteTeamCard data={favoriteDashboard} /> : null}
+
         <ScoreboardSection games={[]} teams={[]} />
 
         <section>
