@@ -4,7 +4,7 @@ import { getRawEspnScoreboard } from "@/integrations/espn/espnAdapter";
 import { normalizeEspnGames } from "@/integrations/espn/espnNormalizers";
 import { getNbaTodayDate } from "@/utils/formatNbaApiDate";
 
-export const revalidate = 30;
+export const revalidate = 15;
 
 function countRawEvents(raw: unknown) {
   if (typeof raw !== "object" || raw === null || !("events" in raw)) return 0;
@@ -16,7 +16,7 @@ export async function GET() {
   const requestedDate = getNbaTodayDate();
 
   try {
-    const result = await getRawEspnScoreboard(requestedDate);
+    const result = await getRawEspnScoreboard(requestedDate, 15);
     const allGames = normalizeEspnGames(result.data);
     const games = allGames.filter((game) => game.status === "live");
 

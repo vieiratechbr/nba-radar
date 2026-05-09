@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getEspnGameSummary } from "@/integrations/espn/espnAdapter";
 import { normalizeEspnGameDetails } from "@/integrations/espn/espnNormalizers";
-import {
-  findHighlightlyMatchByEspnGame,
-  getHighlightlyMatchHighlights
-} from "@/integrations/highlightly/highlightlyAdapter";
+import { getHighlightlyMatchHighlights } from "@/integrations/highlightly/highlightlyAdapter";
+import { findHighlightlyMatchByEspnGameWithDebug } from "@/integrations/highlightly/highlightlyMatchMapper";
 import type { GameHighlight } from "@/types/highlight";
 
 interface GameHighlightsRouteProps {
@@ -48,7 +46,8 @@ export async function GET(_request: NextRequest, { params }: GameHighlightsRoute
     const espnDetails = normalizeEspnGameDetails(rawEspnSummary);
 
     try {
-      const match = await findHighlightlyMatchByEspnGame(espnDetails);
+      const lookup = await findHighlightlyMatchByEspnGameWithDebug(espnDetails);
+      const match = lookup.match;
 
       if (match) {
         const data = await getHighlightlyMatchHighlights(match.id);
@@ -60,7 +59,8 @@ export async function GET(_request: NextRequest, { params }: GameHighlightsRoute
             fallback: false,
             debug: {
               espnEventId: id,
-              highlightlyMatchId: match.id
+              highlightlyMatchId: match.id,
+              lookup: lookup.debug
             }
           });
         }
@@ -73,7 +73,11 @@ export async function GET(_request: NextRequest, { params }: GameHighlightsRoute
         message: "Melhores momentos ainda não disponíveis.",
         debug: {
           espnEventId: id,
-          reason: "Nenhum match/highlight encontrado na Highlightly."
+          highlightlyMatchId: match?.id,
+          lookup: lookup.debug,
+          reason: match
+            ? "Match encontrado na Highlightly, mas nenhum vídeo foi retornado para esta partida."
+            : lookup.debug.reason
         }
       });
     } catch (highlightlyError) {

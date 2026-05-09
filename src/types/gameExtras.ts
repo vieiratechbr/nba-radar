@@ -51,5 +51,6 @@ export type GameExtras = {
   debug?: {
     highlightlyMatchId?: string;
     reason?: string;
+    lookup?: unknown;
   };
 };

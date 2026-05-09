@@ -19,9 +19,14 @@ import type { GameExtras, LastFiveGame, TeamRecentForm } from "@/types/gameExtra
 import type { GameDetails, PlayerBoxScore } from "@/types/gameDetails";
 import type { GameHighlight } from "@/types/highlight";
 import { StatusBadge } from "@/components/StatusBadge";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { getGameDetails, getGameExtras } from "@/services/gamesService";
 import { formatDate } from "@/utils/formatDate";
-import { formatGameDateTimeBrasilia, isUnavailableGameTime } from "@/utils/formatGameTime";
+import {
+  formatGameDateTimeBrasilia,
+  formatLastUpdated,
+  isUnavailableGameTime
+} from "@/utils/formatGameTime";
 
 interface GameDetailsClientProps {
   gameId: string;
@@ -157,16 +162,29 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
   const [extrasLoading, setExtrasLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const fetchDetails = useCallback(() => getGameDetails(gameId), [gameId]);
 
-  const refreshDetails = useCallback(async () => {
-    setRefreshing(true);
+  const loadExtras = useCallback(async (showLoading = true) => {
+    if (showLoading) setExtrasLoading(true);
+
+    try {
+      const data = await getGameExtras(gameId);
+      setExtras(data);
+    } finally {
+      if (showLoading) setExtrasLoading(false);
+    }
+  }, [gameId]);
+
+  const refreshDetails = useCallback(async (silent = false) => {
+    if (!silent) setRefreshing(true);
     setError(null);
 
     try {
       const data = await fetchDetails();
       setDetails(data);
+      setLastUpdated(new Date());
     } catch (requestError) {
       setError(
         requestError instanceof Error
@@ -174,14 +192,14 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
           : "Não foi possível carregar detalhes reais do jogo."
       );
     } finally {
-      setRefreshing(false);
+      if (!silent) setRefreshing(false);
     }
   }, [fetchDetails]);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function loadExtras() {
+    async function loadInitialExtras() {
       setExtrasLoading(true);
       const data = await getGameExtras(gameId);
 
@@ -191,7 +209,7 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
       }
     }
 
-    void loadExtras();
+    void loadInitialExtras();
 
     return () => {
       cancelled = true;
@@ -206,6 +224,7 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
         const data = await fetchDetails();
         if (cancelled) return;
         setDetails(data);
+        setLastUpdated(new Date());
       } catch (requestError) {
         if (cancelled) return;
         setError(
@@ -224,6 +243,14 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
       cancelled = true;
     };
   }, [fetchDetails]);
+
+  const liveAutoRefreshEnabled = details?.status === "live";
+  const refreshLiveData = useCallback(() => {
+    void refreshDetails(true);
+    void loadExtras(false);
+  }, [loadExtras, refreshDetails]);
+
+  useAutoRefresh(refreshLiveData, 15000, liveAutoRefreshEnabled);
 
   const total = useMemo(() => {
     if (!details) return null;
@@ -287,7 +314,7 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
         </Link>
         <button
           type="button"
-          onClick={refreshDetails}
+          onClick={() => void refreshDetails(false)}
           disabled={refreshing}
           className="inline-flex w-fit items-center gap-2 rounded-full bg-court-red px-4 py-2 text-sm font-black text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
@@ -295,6 +322,13 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
           Atualizar dados
         </button>
       </div>
+
+      {liveAutoRefreshEnabled ? (
+        <div className="rounded-lg border border-emerald-400/20 bg-emerald-400/10 p-3 text-xs font-bold text-emerald-200">
+          Atualização automática ativa
+          {lastUpdated ? ` · Última atualização: ${formatLastUpdated(lastUpdated)}` : ""}
+        </div>
+      ) : null}
 
       <section className="overflow-hidden rounded-lg border border-white/10 bg-court-slate/90 shadow-lg">
         <div className="border-b border-white/10 bg-[radial-gradient(circle_at_top,rgba(215,25,32,0.20),transparent_38rem)] p-5 sm:p-7">
@@ -455,7 +489,14 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
             ))}
           </div>
         ) : (
-          <EmptyState>{highlightsEmptyMessage(details.status)}</EmptyState>
+          <div className="grid gap-2">
+            <EmptyState>{highlightsEmptyMessage(details.status)}</EmptyState>
+            {process.env.NODE_ENV !== "production" && details.status === "final" && extras?.debug?.reason ? (
+              <p className="text-xs font-semibold text-zinc-500">
+                Highlightly conectada, mas nenhum vídeo encontrado para esta partida. Debug: {extras.debug.reason}
+              </p>
+            ) : null}
+          </div>
         )}
       </section>
 

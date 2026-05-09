@@ -1,12 +1,9 @@
-import type { GameDetails } from "@/types/gameDetails";
-import { toInputDate } from "@/utils/formatNbaApiDate";
-import { highlightlyFetch } from "@/integrations/highlightly/highlightlyClient";
+import { highlightlyFetch, highlightlyFetchWithMeta } from "@/integrations/highlightly/highlightlyClient";
 import {
   highlightlyEndpoints,
   resolveHighlightlyEndpoint
 } from "@/integrations/highlightly/highlightlyEndpoints";
 import {
-  namesLikelyMatch,
   normalizeHighlightlyHeadToHead,
   normalizeHighlightlyHighlights,
   normalizeHighlightlyLastFiveGames,
@@ -17,6 +14,7 @@ import {
 type HighlightlyMatchSearch = {
   date?: string;
   leagueId?: string | number;
+  leagueName?: string;
   limit?: number;
   offset?: number;
 };
@@ -24,11 +22,13 @@ type HighlightlyMatchSearch = {
 type HighlightlyTeam = {
   id?: string;
   name?: string;
+  logoUrl?: string;
 };
 
 export type HighlightlyMatchCandidate = {
   id: string;
   date?: string;
+  leagueName?: string;
   homeTeam?: HighlightlyTeam;
   awayTeam?: HighlightlyTeam;
   raw: unknown;
@@ -50,17 +50,28 @@ function readString(source: Record<string, unknown> | undefined, keys: string[],
   return fallback;
 }
 
-function readArray(raw: unknown) {
+export function readHighlightlyArray(raw: unknown) {
   if (Array.isArray(raw)) return raw;
   const record = readRecord(raw);
   if (!record) return [];
 
-  for (const key of ["data", "matches", "results"]) {
+  for (const key of ["data", "matches", "results", "response", "result", "items"]) {
     const value = record[key];
     if (Array.isArray(value)) return value;
   }
 
   return [];
+}
+
+function createMatchSearchParams(params?: HighlightlyMatchSearch) {
+  return {
+    date: params?.date,
+    leagueId: params?.leagueId,
+    leagueName: params?.leagueName,
+    timezone: "America/Sao_Paulo",
+    limit: params?.limit ?? 100,
+    offset: params?.offset ?? 0
+  };
 }
 
 function normalizeMatchCandidate(rawMatch: unknown): HighlightlyMatchCandidate | null {
@@ -69,52 +80,51 @@ function normalizeMatchCandidate(rawMatch: unknown): HighlightlyMatchCandidate |
 
   const homeTeam = readRecord(match.homeTeam);
   const awayTeam = readRecord(match.awayTeam);
-  const id = readString(match, ["id"], "");
+  const league = readRecord(match.league);
+  const id = readString(match, ["id", "matchId"], "");
   if (!id) return null;
 
   return {
     id,
-    date: readString(match, ["date"], undefined),
+    date: readString(match, ["date", "startTime", "scheduled"], undefined),
+    leagueName: readString(league, ["name"], undefined),
     homeTeam: {
       id: readString(homeTeam, ["id"], undefined),
-      name: readString(homeTeam, ["name"], undefined)
+      name: readString(homeTeam, ["name"], undefined),
+      logoUrl: readString(homeTeam, ["logo", "logoUrl"], undefined)
     },
     awayTeam: {
       id: readString(awayTeam, ["id"], undefined),
-      name: readString(awayTeam, ["name"], undefined)
+      name: readString(awayTeam, ["name"], undefined),
+      logoUrl: readString(awayTeam, ["logo", "logoUrl"], undefined)
     },
     raw: rawMatch
   };
 }
 
 export async function getHighlightlyLiveScores() {
-  return getHighlightlyMatches({ limit: 100 });
+  return getHighlightlyMatches({ leagueName: "NBA", limit: 100 });
 }
 
 export async function getHighlightlyMatches(params?: HighlightlyMatchSearch) {
   const raw = await highlightlyFetch(highlightlyEndpoints.matches, {
-    searchParams: {
-      date: params?.date,
-      leagueId: params?.leagueId,
-      timezone: "America/Sao_Paulo",
-      limit: params?.limit ?? 100,
-      offset: params?.offset ?? 0
-    },
+    searchParams: createMatchSearchParams(params),
     revalidate: 60
   });
 
-  return readArray(raw).map(normalizeMatchCandidate).filter(Boolean) as HighlightlyMatchCandidate[];
+  return readHighlightlyArray(raw).map(normalizeMatchCandidate).filter(Boolean) as HighlightlyMatchCandidate[];
 }
 
 export async function getHighlightlyRawMatches(params?: HighlightlyMatchSearch) {
   return highlightlyFetch(highlightlyEndpoints.matches, {
-    searchParams: {
-      date: params?.date,
-      leagueId: params?.leagueId,
-      timezone: "America/Sao_Paulo",
-      limit: params?.limit ?? 100,
-      offset: params?.offset ?? 0
-    },
+    searchParams: createMatchSearchParams(params),
+    revalidate: 60
+  });
+}
+
+export async function getHighlightlyRawMatchesResponse(params?: HighlightlyMatchSearch) {
+  return highlightlyFetchWithMeta(highlightlyEndpoints.matches, {
+    searchParams: createMatchSearchParams(params),
     revalidate: 60
   });
 }
@@ -125,24 +135,35 @@ export async function getHighlightlyMatchDetails(matchId: string) {
   });
 }
 
-export async function getHighlightlyMatchHighlights(matchId: string) {
-  const raw = await highlightlyFetch(highlightlyEndpoints.matchHighlights, {
-    searchParams: {
-      matchId,
-      limit: 20,
-      offset: 0
-    },
-    revalidate: 900
-  });
-
+export async function getHighlightlyHighlightsByMatchId(matchId: string) {
+  const raw = await getHighlightlyRawHighlights(matchId);
   return normalizeHighlightlyHighlights(raw);
+}
+
+export async function getHighlightlyMatchHighlights(matchId: string) {
+  return getHighlightlyHighlightsByMatchId(matchId);
 }
 
 export async function getHighlightlyRawHighlights(matchId: string) {
   return highlightlyFetch(highlightlyEndpoints.matchHighlights, {
     searchParams: {
       matchId,
-      limit: 20,
+      leagueName: "NBA",
+      timezone: "America/Sao_Paulo",
+      limit: 40,
+      offset: 0
+    },
+    revalidate: 900
+  });
+}
+
+export async function getHighlightlyRawHighlightsResponse(matchId: string) {
+  return highlightlyFetchWithMeta(highlightlyEndpoints.matchHighlights, {
+    searchParams: {
+      matchId,
+      leagueName: "NBA",
+      timezone: "America/Sao_Paulo",
+      limit: 40,
       offset: 0
     },
     revalidate: 900
@@ -184,22 +205,4 @@ export async function getHighlightlyLastFiveGames(teamId: string, teamName?: str
   });
 
   return normalizeHighlightlyLastFiveGames(raw, teamId, teamName);
-}
-
-export async function findHighlightlyMatchByEspnGame(gameDetails: GameDetails) {
-  const date = toInputDate(gameDetails.date);
-  const matches = await getHighlightlyMatches({ date, limit: 100 });
-
-  return matches.find((match) => {
-    const homeMatches =
-      namesLikelyMatch(gameDetails.homeTeam.fullName, match.homeTeam?.name ?? "") ||
-      namesLikelyMatch(gameDetails.homeTeam.name, match.homeTeam?.name ?? "") ||
-      namesLikelyMatch(gameDetails.homeTeam.abbreviation, match.homeTeam?.name ?? "");
-    const awayMatches =
-      namesLikelyMatch(gameDetails.visitorTeam.fullName, match.awayTeam?.name ?? "") ||
-      namesLikelyMatch(gameDetails.visitorTeam.name, match.awayTeam?.name ?? "") ||
-      namesLikelyMatch(gameDetails.visitorTeam.abbreviation, match.awayTeam?.name ?? "");
-
-    return homeMatches && awayMatches;
-  }) ?? null;
 }

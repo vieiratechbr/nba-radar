@@ -1,4 +1,5 @@
 import type { AwardWinner } from "@/types/award";
+import { getPlayerImageUrl } from "@/utils/playerImages";
 
 const pending2025Awards: AwardWinner[] = [
   "MVP",
@@ -18,7 +19,7 @@ const pending2025Awards: AwardWinner[] = [
   summary: "Vencedor ainda não definido oficialmente na base local inicial."
 }));
 
-export const mockAwards: AwardWinner[] = [
+const awards: AwardWinner[] = [
   ...pending2025Awards,
   {
     id: "2024-25-mvp",
@@ -219,3 +220,8 @@ export const mockAwards: AwardWinner[] = [
     summary: "Controle absoluto da série com passe, pontuação e leitura de jogo."
   }
 ];
+
+export const mockAwards: AwardWinner[] = awards.map((award) => ({
+  ...award,
+  imageUrl: getPlayerImageUrl(award.playerName, award.imageUrl)
+}));

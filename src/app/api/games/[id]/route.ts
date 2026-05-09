@@ -8,7 +8,7 @@ interface GameSummaryRouteProps {
   }>;
 }
 
-export const revalidate = 30;
+export const revalidate = 15;
 
 export async function GET(_request: NextRequest, { params }: GameSummaryRouteProps) {
   const { id } = await params;

@@ -49,7 +49,7 @@ export async function getEspnStandings() {
   }
 }
 
-export async function getRawEspnScoreboard(date?: Date | string) {
+export async function getRawEspnScoreboard(date?: Date | string, revalidate = 30) {
   const formattedDate = formatNbaApiDate(date ?? getNbaTodayDate());
   const url = new URL(espnEndpoints.nbaScoreboard);
   url.searchParams.set("dates", formattedDate);
@@ -57,7 +57,7 @@ export async function getRawEspnScoreboard(date?: Date | string) {
   return {
     requestedDate: formattedDate,
     url: url.toString(),
-    data: await espnFetch(url.toString(), { revalidate: 60 })
+    data: await espnFetch(url.toString(), { revalidate })
   };
 }
 

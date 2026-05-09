@@ -1,45 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import { Trophy } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { PlayerAvatar } from "@/components/PlayerAvatar";
 import type { AwardWinner } from "@/types/award";
 import { getAwards } from "@/services/awardsService";
 
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
-
 function sortSeasonsDesc(seasons: string[]) {
   return [...seasons].sort((a, b) => b.localeCompare(a));
-}
-
-function PlayerAvatar({ award }: { award: AwardWinner }) {
-  const playerName = award.playerName ?? "A definir";
-
-  if (award.imageUrl) {
-    return (
-      <Image
-        src={award.imageUrl}
-        alt={playerName}
-        width={72}
-        height={72}
-        className="h-16 w-16 rounded-full border border-white/15 object-cover"
-      />
-    );
-  }
-
-  return (
-    <div className="grid h-16 w-16 place-items-center rounded-full border border-court-red/40 bg-[radial-gradient(circle_at_top,rgba(215,25,32,0.34),rgba(14,15,20,0.96))] text-lg font-black text-white shadow-lg">
-      {award.status === "pending" ? "?" : getInitials(playerName)}
-    </div>
-  );
 }
 
 export function AwardsClient() {
@@ -140,7 +108,11 @@ export function AwardsClient() {
             >
               <div className="mb-5 flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <PlayerAvatar award={award} />
+                  <PlayerAvatar
+                    name={isPending ? "A definir" : playerName}
+                    imageUrl={isPending ? undefined : award.imageUrl}
+                    size="lg"
+                  />
                   <div className="grid h-11 w-11 place-items-center rounded-md bg-court-red/20 text-court-red">
                     <Trophy className="h-5 w-5" aria-hidden="true" />
                   </div>

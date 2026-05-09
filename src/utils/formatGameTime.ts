@@ -44,3 +44,16 @@ export function formatGameDateTimeBrasilia(date: string | Date): string {
 export function isUnavailableGameTime(value: string) {
   return value === unavailableTime;
 }
+
+export function formatLastUpdated(date: Date | string): string {
+  const parsedDate = parseGameDate(date);
+  if (!parsedDate) return unavailableTime;
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: brasiliaTimeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false
+  }).format(parsedDate);
+}

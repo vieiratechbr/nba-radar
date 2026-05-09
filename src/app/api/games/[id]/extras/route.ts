@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getEspnGameSummary } from "@/integrations/espn/espnAdapter";
 import { normalizeEspnGameDetails } from "@/integrations/espn/espnNormalizers";
 import {
-  findHighlightlyMatchByEspnGame,
   getHighlightlyHeadToHead,
   getHighlightlyLastFiveGames,
   getHighlightlyMatchDetails,
   getHighlightlyMatchHighlights,
   getHighlightlyPredictions
 } from "@/integrations/highlightly/highlightlyAdapter";
+import { findHighlightlyMatchByEspnGameWithDebug } from "@/integrations/highlightly/highlightlyMatchMapper";
 import { normalizeHighlightlyPrediction } from "@/integrations/highlightly/highlightlyNormalizers";
 import type { GameExtras } from "@/types/gameExtras";
 
@@ -37,7 +37,8 @@ export async function GET(_request: NextRequest, { params }: GameExtrasRouteProp
   try {
     const rawEspnSummary = await getEspnGameSummary(id);
     const espnDetails = normalizeEspnGameDetails(rawEspnSummary);
-    const match = await findHighlightlyMatchByEspnGame(espnDetails);
+    const lookup = await findHighlightlyMatchByEspnGameWithDebug(espnDetails);
+    const match = lookup.match;
 
     if (!match) {
       return NextResponse.json({
@@ -45,7 +46,7 @@ export async function GET(_request: NextRequest, { params }: GameExtrasRouteProp
           ...emptyExtras,
           message: "Dados complementares ainda não encontrados na Highlightly.",
           debug: {
-            reason: "Match correspondente não encontrado por data e times."
+            reason: lookup.debug.reason ?? "Match correspondente não encontrado por data e times."
           }
         },
         fallback: false,
@@ -79,7 +80,8 @@ export async function GET(_request: NextRequest, { params }: GameExtrasRouteProp
       },
       source: "highlightly",
       debug: {
-        highlightlyMatchId: match.id
+        highlightlyMatchId: match.id,
+        lookup: lookup.debug
       }
     };
 

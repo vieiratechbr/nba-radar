@@ -1,14 +1,16 @@
 "use client";
 
 import { CalendarDays, Search } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Game } from "@/types/game";
 import type { Team } from "@/types/team";
 import { FilterTabs } from "@/components/FilterTabs";
 import { GameCard } from "@/components/GameCard";
 import { SectionTitle } from "@/components/SectionTitle";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { getGamesResult } from "@/services/gamesService";
 import { filterGames, scoreFilters, type ScoreFilter } from "@/utils/filterHelpers";
+import { formatLastUpdated } from "@/utils/formatGameTime";
 import { toInputDate } from "@/utils/formatNbaApiDate";
 
 interface ScoresClientProps {
@@ -42,6 +44,34 @@ export function ScoresClient({ games, teams }: ScoresClientProps) {
   const [fallbackMessage, setFallbackMessage] = useState<string | null>(null);
   const [emptyMessage, setEmptyMessage] = useState<string | null>(null);
   const [liveEmpty, setLiveEmpty] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const hasLiveGame = useMemo(
+    () => visibleGames.some((game) => game.status === "live"),
+    [visibleGames]
+  );
+
+  const loadGames = useCallback(async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    const result = await getGamesResult(dateState.selectedDate);
+
+    if (result.source === "espn") {
+      setLiveEmpty(!result.data.some((game) => game.status === "live"));
+      setFallbackMessage(null);
+      setEmptyMessage(result.empty ? result.message ?? "Nenhum jogo encontrado." : null);
+      setVisibleGames(result.data);
+    } else {
+      setLiveEmpty(!result.data.some((game) => game.status === "live"));
+      setFallbackMessage(
+        result.message ??
+          "Não foi possível carregar os dados reais agora. Exibindo dados de demonstração."
+      );
+      setEmptyMessage(null);
+      setVisibleGames(result.data.length ? result.data : games);
+    }
+
+    setLastUpdated(new Date());
+    if (showLoading) setLoading(false);
+  }, [dateState.selectedDate, games]);
 
   useEffect(() => {
     let cancelled = false;
@@ -67,6 +97,7 @@ export function ScoresClient({ games, teams }: ScoresClientProps) {
         setVisibleGames(result.data.length ? result.data : games);
       }
 
+      setLastUpdated(new Date());
       setLoading(false);
     }
 
@@ -76,6 +107,10 @@ export function ScoresClient({ games, teams }: ScoresClientProps) {
       cancelled = true;
     };
   }, [dateState.selectedDate, games]);
+
+  useAutoRefresh(() => {
+    void loadGames(false);
+  }, 30000, hasLiveGame);
 
   const filteredGames = useMemo(
     () => filterGames(visibleGames, selectedStatus, selectedTeam),
@@ -168,6 +203,13 @@ export function ScoresClient({ games, teams }: ScoresClientProps) {
       {emptyMessage ? (
         <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4 text-sm font-semibold text-zinc-300">
           {emptyMessage}
+        </div>
+      ) : null}
+
+      {hasLiveGame ? (
+        <div className="rounded-lg border border-emerald-400/20 bg-emerald-400/10 p-3 text-xs font-bold text-emerald-200">
+          Atualização automática ativa
+          {lastUpdated ? ` · Última atualização: ${formatLastUpdated(lastUpdated)}` : ""}
         </div>
       ) : null}
 

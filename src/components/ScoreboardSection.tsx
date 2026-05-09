@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Game } from "@/types/game";
 import type { Team } from "@/types/team";
 import { GameCard } from "@/components/GameCard";
 import { SectionTitle } from "@/components/SectionTitle";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { getTodayGamesResult } from "@/services/gamesService";
+import { formatLastUpdated } from "@/utils/formatGameTime";
 
 interface ScoreboardSectionProps {
   games: Game[];
@@ -25,11 +27,25 @@ export function ScoreboardSection({
   const [visibleGames, setVisibleGames] = useState(games);
   const [fallbackMessage, setFallbackMessage] = useState<string | null>(null);
   const [emptyMessage, setEmptyMessage] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const hasLiveGame = useMemo(
+    () => visibleGames.some((game) => game.status === "live"),
+    [visibleGames]
+  );
+
+  const loadTodayGames = useCallback(async () => {
+    const result = await getTodayGamesResult();
+
+    setVisibleGames(result.data);
+    setFallbackMessage(result.fallback ? result.message ?? "Exibindo dados de demonstração." : null);
+    setEmptyMessage(!result.fallback && result.empty ? result.message ?? "Nenhum jogo encontrado." : null);
+    setLastUpdated(new Date());
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function loadTodayGames() {
+    async function loadInitialTodayGames() {
       const result = await getTodayGamesResult();
 
       if (cancelled) return;
@@ -37,14 +53,19 @@ export function ScoreboardSection({
       setVisibleGames(result.data);
       setFallbackMessage(result.fallback ? result.message ?? "Exibindo dados de demonstração." : null);
       setEmptyMessage(!result.fallback && result.empty ? result.message ?? "Nenhum jogo encontrado." : null);
+      setLastUpdated(new Date());
     }
 
-    loadTodayGames();
+    void loadInitialTodayGames();
 
     return () => {
       cancelled = true;
     };
   }, [games]);
+
+  useAutoRefresh(() => {
+    void loadTodayGames();
+  }, 30000, hasLiveGame);
 
   return (
     <section>
@@ -70,6 +91,12 @@ export function ScoreboardSection({
       {emptyMessage ? (
         <div className="mb-5 rounded-lg border border-white/10 bg-white/[0.03] p-4 text-sm font-semibold text-zinc-300">
           {emptyMessage}
+        </div>
+      ) : null}
+      {hasLiveGame ? (
+        <div className="mb-5 rounded-lg border border-emerald-400/20 bg-emerald-400/10 p-3 text-xs font-bold text-emerald-200">
+          Atualização automática ativa
+          {lastUpdated ? ` · Última atualização: ${formatLastUpdated(lastUpdated)}` : ""}
         </div>
       ) : null}
       {visibleGames.length > 0 ? (

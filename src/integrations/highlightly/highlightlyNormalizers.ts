@@ -105,23 +105,27 @@ export function namesLikelyMatch(a: string, b: string) {
 }
 
 export function normalizeHighlightlyHighlights(raw: unknown): GameHighlight[] {
-  const rows = readArray(raw, ["data", "highlights", "results"]);
+  const rows = readArray(raw, ["data", "highlights", "response", "result", "items", "videos", "results"]);
   const highlights: GameHighlight[] = [];
 
   rows.filter(isRecord).forEach((highlight, index) => {
-    const videoUrl = readString(highlight, ["videoUrl", "url", "video", "href"], "");
+    const embedUrl = readString(highlight, ["embedUrl", "embed", "iframe"], undefined);
+    const videoUrl =
+      readString(highlight, ["videoUrl", "url", "video", "sourceUrl", "link", "href"], "") ||
+      embedUrl ||
+      "";
     if (!videoUrl || !isSafeExternalUrl(videoUrl)) return;
 
     highlights.push({
-      id: readString(highlight, ["id"], `highlight-${index}`),
-      title: readString(highlight, ["title", "name"], "Melhor momento da partida"),
+      id: readString(highlight, ["id", "highlightId", "videoId"], `highlight-${index}`),
+      title: readString(highlight, ["title", "name", "heading"], "Melhor momento da partida"),
       description: readString(highlight, ["description", "summary"], undefined),
-      thumbnailUrl: readString(highlight, ["thumbnailUrl", "thumbnail", "image", "imgUrl"], undefined),
+      thumbnailUrl: readString(highlight, ["thumbnailUrl", "thumbnail", "image", "cover", "imgUrl"], undefined),
       videoUrl,
-      embedUrl: readString(highlight, ["embedUrl", "embed"], undefined),
+      embedUrl,
       source: "highlightly",
       publishedAt: readString(highlight, ["publishedAt", "date", "createdAt"], undefined),
-      isEmbeddable: Boolean(highlight.embeddable ?? readString(highlight, ["embedUrl", "embed"], ""))
+      isEmbeddable: Boolean(highlight.embeddable ?? embedUrl)
     });
   });
 

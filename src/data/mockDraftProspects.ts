@@ -1,6 +1,7 @@
 import type { DraftProspect } from "@/types/draft";
+import { getDraftPlayerImageUrl } from "@/utils/draftPlayerImages";
 
-export const mockDraftProspects: DraftProspect[] = [
+const prospects: DraftProspect[] = [
   {
     id: "2026-aj-dybantsa",
     year: "2026",
@@ -122,3 +123,8 @@ export const mockDraftProspects: DraftProspect[] = [
     weakness: ["Criação primária", "Volume ofensivo"]
   }
 ];
+
+export const mockDraftProspects: DraftProspect[] = prospects.map((prospect) => ({
+  ...prospect,
+  imageUrl: getDraftPlayerImageUrl(prospect.playerName, prospect.imageUrl)
+}));
