@@ -18,7 +18,7 @@ export function HighlightVideoCard({ highlight }: HighlightVideoCardProps) {
   const externalUrl = highlight.videoUrl ?? highlight.embedUrl ?? "#";
 
   return (
-    <article className="group overflow-hidden rounded-md border border-white/10 bg-black/20 transition hover:border-court-red/60 hover:bg-black/35">
+    <article className="group overflow-hidden rounded-xl border border-white/10 bg-black/25 shadow-[0_18px_45px_rgba(0,0,0,0.22)] transition duration-300 hover:-translate-y-0.5 hover:border-court-red/55 hover:bg-black/40 hover:shadow-[0_20px_70px_rgba(215,25,32,0.12)]">
       <div className="relative aspect-video bg-court-black">
         {displayMode === "iframe" ? (
           <iframe
@@ -61,7 +61,7 @@ export function HighlightVideoCard({ highlight }: HighlightVideoCardProps) {
               href={externalUrl}
               target="_blank"
               rel="noreferrer"
-              className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full bg-black/75 px-3 py-1 text-xs font-black text-white transition hover:text-court-red"
+              className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/75 px-3 py-1 text-xs font-black text-white shadow-lg transition hover:border-court-red/45 hover:text-court-red"
             >
               <Play className="h-3.5 w-3.5 text-court-red" aria-hidden="true" />
               Abrir vídeo
