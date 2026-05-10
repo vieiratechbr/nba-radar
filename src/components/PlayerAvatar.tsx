@@ -6,19 +6,21 @@ import { useState } from "react";
 type PlayerAvatarProps = {
   name: string;
   imageUrl?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
 };
 
 const sizeClasses = {
   sm: "h-11 w-11 text-xs",
   md: "h-14 w-14 text-sm",
-  lg: "h-16 w-16 text-lg"
+  lg: "h-16 w-16 text-lg",
+  xl: "h-20 w-20 text-xl"
 };
 
 const imageSizes = {
   sm: 44,
   md: 56,
-  lg: 64
+  lg: 64,
+  xl: 80
 };
 
 function getInitials(name: string) {

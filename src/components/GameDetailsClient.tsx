@@ -27,6 +27,7 @@ import {
   formatLastUpdated,
   isUnavailableGameTime
 } from "@/utils/formatGameTime";
+import { getAutoRefreshLabel, shouldAutoRefreshGame } from "@/utils/gameRefresh";
 
 interface GameDetailsClientProps {
   gameId: string;
@@ -91,9 +92,11 @@ function highlightsEmptyMessage(status: GameDetails["status"]) {
 }
 
 function HighlightCard({ highlight }: { highlight: GameHighlight }) {
+  const href = highlight.videoUrl ?? highlight.embedUrl ?? "#";
+
   return (
     <a
-      href={highlight.embedUrl ?? highlight.videoUrl}
+      href={href}
       target="_blank"
       rel="noreferrer"
       className="group overflow-hidden rounded-md border border-white/10 bg-black/20 transition hover:border-court-red/60 hover:bg-black/35"
@@ -244,13 +247,14 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
     };
   }, [fetchDetails]);
 
-  const liveAutoRefreshEnabled = details?.status === "live";
+  const autoRefreshEnabled = details ? shouldAutoRefreshGame(details) : false;
+  const autoRefreshLabel = details ? getAutoRefreshLabel([details]) : "";
   const refreshLiveData = useCallback(() => {
     void refreshDetails(true);
     void loadExtras(false);
   }, [loadExtras, refreshDetails]);
 
-  useAutoRefresh(refreshLiveData, 15000, liveAutoRefreshEnabled);
+  useAutoRefresh(refreshLiveData, 15000, autoRefreshEnabled);
 
   const total = useMemo(() => {
     if (!details) return null;
@@ -323,9 +327,9 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
         </button>
       </div>
 
-      {liveAutoRefreshEnabled ? (
+      {autoRefreshEnabled ? (
         <div className="rounded-lg border border-emerald-400/20 bg-emerald-400/10 p-3 text-xs font-bold text-emerald-200">
-          Atualização automática ativa
+          {autoRefreshLabel || "Atualização automática ativa"}
           {lastUpdated ? ` · Última atualização: ${formatLastUpdated(lastUpdated)}` : ""}
         </div>
       ) : null}
@@ -481,7 +485,7 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
           <h2 className="text-xl font-black text-white">Melhores momentos</h2>
         </div>
         {extrasLoading ? (
-          <EmptyState>Buscando dados complementares da Highlightly...</EmptyState>
+          <EmptyState>Buscando melhores momentos e dados complementares...</EmptyState>
         ) : highlights.length ? (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {highlights.slice(0, 6).map((highlight) => (
@@ -493,7 +497,7 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
             <EmptyState>{highlightsEmptyMessage(details.status)}</EmptyState>
             {process.env.NODE_ENV !== "production" && details.status === "final" && extras?.debug?.reason ? (
               <p className="text-xs font-semibold text-zinc-500">
-                Highlightly conectada, mas nenhum vídeo encontrado para esta partida. Debug: {extras.debug.reason}
+                ESPN/Highlightly consultadas, mas nenhum vídeo foi encontrado para esta partida. Debug: {extras.debug.reason}
               </p>
             ) : null}
           </div>
@@ -629,3 +633,4 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
     </div>
   );
 }
+

@@ -35,7 +35,7 @@ type GameDetailsApiPayload = {
 type GameExtrasApiPayload = {
   data?: GameExtras;
   fallback?: boolean;
-  source?: "highlightly" | "none";
+  source?: "espn" | "highlightly" | "none";
   message?: string;
 };
 

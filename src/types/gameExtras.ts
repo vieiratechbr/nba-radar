@@ -46,10 +46,12 @@ export type GameExtras = {
     home: TeamRecentForm | null;
     visitor: TeamRecentForm | null;
   };
-  source: "highlightly" | "none";
+  source: "espn" | "highlightly" | "none";
   message?: string;
   debug?: {
     highlightlyMatchId?: string;
+    espnHighlightsCount?: number;
+    highlightlyHighlightsCount?: number;
     reason?: string;
     lookup?: unknown;
   };

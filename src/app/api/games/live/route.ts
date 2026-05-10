@@ -4,6 +4,7 @@ import { getRawEspnScoreboard } from "@/integrations/espn/espnAdapter";
 import { normalizeEspnGames } from "@/integrations/espn/espnNormalizers";
 import { getNbaTodayDate } from "@/utils/formatNbaApiDate";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 15;
 
 function countRawEvents(raw: unknown) {

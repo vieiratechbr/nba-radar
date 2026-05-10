@@ -114,7 +114,7 @@ function normalizeConference(value: string) {
 function normalizeStatus(status: UnknownRecord | undefined): GameStatus {
   const type = readRecord(status, ["type"]);
   const state = readString(type, ["state"], "").toLowerCase();
-  const name = readString(type, ["name", "shortDetail", "description"], "").toLowerCase();
+  const name = readString(type, ["name", "shortDetail", "detail", "description"], "").toLowerCase();
   const completed = Boolean(status?.completed || type?.completed);
 
   if (completed || state === "post" || name.includes("final")) return "final";

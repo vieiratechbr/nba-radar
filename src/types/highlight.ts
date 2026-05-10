@@ -3,7 +3,7 @@ export type GameHighlight = {
   title: string;
   description?: string;
   thumbnailUrl?: string;
-  videoUrl: string;
+  videoUrl?: string;
   embedUrl?: string;
   source: "highlightly" | "espn" | "external";
   publishedAt?: string;

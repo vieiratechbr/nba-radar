@@ -2,13 +2,13 @@
 
 import { useEffect } from "react";
 
-export function useAutoRefresh(callback: () => void, intervalMs: number, enabled: boolean) {
+export function useAutoRefresh(callback: () => void | Promise<void>, intervalMs: number, enabled: boolean) {
   useEffect(() => {
     if (!enabled) return;
 
     const tick = () => {
-      if (document.visibilityState === "visible") {
-        callback();
+      if (typeof document === "undefined" || document.visibilityState === "visible") {
+        void callback();
       }
     };
 

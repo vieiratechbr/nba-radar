@@ -22,11 +22,11 @@ export async function getEspnLiveGames() {
   return games.filter((game) => game.status === "live");
 }
 
-export async function getEspnGameSummary(eventId: string) {
+export async function getEspnGameSummary(eventId: string, revalidate = 10) {
   const url = new URL(espnEndpoints.nbaSummary);
   url.searchParams.set("event", eventId);
 
-  return espnFetch(url.toString(), { revalidate: 30 });
+  return espnFetch(url.toString(), { revalidate });
 }
 
 export async function getEspnNews() {

@@ -12,6 +12,7 @@ import { getGamesResult } from "@/services/gamesService";
 import { filterGames, scoreFilters, type ScoreFilter } from "@/utils/filterHelpers";
 import { formatLastUpdated } from "@/utils/formatGameTime";
 import { toInputDate } from "@/utils/formatNbaApiDate";
+import { getAutoRefreshLabel, shouldAutoRefreshGames } from "@/utils/gameRefresh";
 
 interface ScoresClientProps {
   games: Game[];
@@ -45,10 +46,8 @@ export function ScoresClient({ games, teams }: ScoresClientProps) {
   const [emptyMessage, setEmptyMessage] = useState<string | null>(null);
   const [liveEmpty, setLiveEmpty] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const hasLiveGame = useMemo(
-    () => visibleGames.some((game) => game.status === "live"),
-    [visibleGames]
-  );
+  const autoRefreshEnabled = useMemo(() => shouldAutoRefreshGames(visibleGames), [visibleGames]);
+  const autoRefreshLabel = useMemo(() => getAutoRefreshLabel(visibleGames), [visibleGames]);
 
   const loadGames = useCallback(async (showLoading = true) => {
     if (showLoading) setLoading(true);
@@ -76,7 +75,7 @@ export function ScoresClient({ games, teams }: ScoresClientProps) {
   useEffect(() => {
     let cancelled = false;
 
-    async function loadGames() {
+    async function loadInitialGames() {
       setLoading(true);
       const result = await getGamesResult(dateState.selectedDate);
 
@@ -101,7 +100,7 @@ export function ScoresClient({ games, teams }: ScoresClientProps) {
       setLoading(false);
     }
 
-    loadGames();
+    void loadInitialGames();
 
     return () => {
       cancelled = true;
@@ -110,7 +109,7 @@ export function ScoresClient({ games, teams }: ScoresClientProps) {
 
   useAutoRefresh(() => {
     void loadGames(false);
-  }, 30000, hasLiveGame);
+  }, 30000, autoRefreshEnabled);
 
   const filteredGames = useMemo(
     () => filterGames(visibleGames, selectedStatus, selectedTeam),
@@ -206,9 +205,9 @@ export function ScoresClient({ games, teams }: ScoresClientProps) {
         </div>
       ) : null}
 
-      {hasLiveGame ? (
+      {autoRefreshEnabled ? (
         <div className="rounded-lg border border-emerald-400/20 bg-emerald-400/10 p-3 text-xs font-bold text-emerald-200">
-          Atualização automática ativa
+          {autoRefreshLabel || "Atualização automática ativa"}
           {lastUpdated ? ` · Última atualização: ${formatLastUpdated(lastUpdated)}` : ""}
         </div>
       ) : null}

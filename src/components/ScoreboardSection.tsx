@@ -10,6 +10,7 @@ import { SectionTitle } from "@/components/SectionTitle";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { getTodayGamesResult } from "@/services/gamesService";
 import { formatLastUpdated } from "@/utils/formatGameTime";
+import { getAutoRefreshLabel, shouldAutoRefreshGames } from "@/utils/gameRefresh";
 
 interface ScoreboardSectionProps {
   games: Game[];
@@ -28,10 +29,8 @@ export function ScoreboardSection({
   const [fallbackMessage, setFallbackMessage] = useState<string | null>(null);
   const [emptyMessage, setEmptyMessage] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const hasLiveGame = useMemo(
-    () => visibleGames.some((game) => game.status === "live"),
-    [visibleGames]
-  );
+  const autoRefreshEnabled = useMemo(() => shouldAutoRefreshGames(visibleGames), [visibleGames]);
+  const autoRefreshLabel = useMemo(() => getAutoRefreshLabel(visibleGames), [visibleGames]);
 
   const loadTodayGames = useCallback(async () => {
     const result = await getTodayGamesResult();
@@ -65,7 +64,7 @@ export function ScoreboardSection({
 
   useAutoRefresh(() => {
     void loadTodayGames();
-  }, 30000, hasLiveGame);
+  }, 30000, autoRefreshEnabled);
 
   return (
     <section>
@@ -93,9 +92,9 @@ export function ScoreboardSection({
           {emptyMessage}
         </div>
       ) : null}
-      {hasLiveGame ? (
+      {autoRefreshEnabled ? (
         <div className="mb-5 rounded-lg border border-emerald-400/20 bg-emerald-400/10 p-3 text-xs font-bold text-emerald-200">
-          Atualização automática ativa
+          {autoRefreshLabel || "Atualização automática ativa"}
           {lastUpdated ? ` · Última atualização: ${formatLastUpdated(lastUpdated)}` : ""}
         </div>
       ) : null}

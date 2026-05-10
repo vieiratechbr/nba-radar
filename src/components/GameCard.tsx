@@ -6,6 +6,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { TeamBadge } from "@/components/TeamBadge";
 import { formatShortDate } from "@/utils/formatDate";
 import { formatGameTimeBrasilia, isUnavailableGameTime } from "@/utils/formatGameTime";
+import { isScheduledNearStart } from "@/utils/gameRefresh";
 
 interface GameCardProps {
   game: Game;
@@ -41,9 +42,10 @@ export function GameCard({ game, teams, compact = false }: GameCardProps) {
   const awayScore = game.visitorTeam?.score ?? game.awayScore;
   const hasScore = typeof homeScore === "number" && typeof awayScore === "number";
   const scheduledTime = game.time ?? formatGameTimeBrasilia(game.date);
+  const scheduledNearStart = game.status === "scheduled" && isScheduledNearStart(game.date);
   const periodLabel =
     game.status === "scheduled"
-      ? `Agendado · ${scheduledTime}${isUnavailableGameTime(scheduledTime) ? "" : " BRT"}`
+      ? `Agendado · ${scheduledTime}${isUnavailableGameTime(scheduledTime) ? "" : " BRT"}${scheduledNearStart ? " · aguardando atualização" : ""}`
       : typeof game.period === "number"
       ? `${game.period}º quarto`
       : game.period ?? game.clock ?? game.time ?? "Horário indefinido";
@@ -155,3 +157,4 @@ export function GameCard({ game, teams, compact = false }: GameCardProps) {
     </article>
   );
 }
+
