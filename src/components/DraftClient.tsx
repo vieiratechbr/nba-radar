@@ -6,7 +6,6 @@ import { PlayerAvatar } from "@/components/PlayerAvatar";
 import type { DraftProspect } from "@/types/draft";
 import { getDraftProspects } from "@/services/draftService";
 
-
 export function DraftClient() {
   const [prospects, setProspects] = useState<DraftProspect[]>([]);
   const [selectedYear, setSelectedYear] = useState("Todos");
@@ -23,7 +22,7 @@ export function DraftClient() {
       if (cancelled) return;
 
       setProspects(result.data);
-      setMessage("Base local inicial de prospectos. Ranking sujeito a mudanças.");
+      setMessage("Base local inicial de prospectos. Ranking sujeito a mudanças. Imagens podem usar fallback quando não houver foto oficial disponível.");
       setLoading(false);
     }
 

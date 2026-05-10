@@ -5,15 +5,17 @@ import type { ServiceResult } from "@/types/service";
 type AwardsApiPayload = {
   data?: AwardWinner[];
   fallback?: boolean;
-  source?: "mock";
+  source?: "espn" | "mock";
   message?: string;
   empty?: boolean;
 };
 
+const localAwardsMessage = "Dados de prêmios usando base local inicial.";
+
 export async function getAwards(season?: string): Promise<ServiceResult<AwardWinner[]>> {
   if (typeof window === "undefined") {
     const data = season ? mockAwards.filter((award) => award.season === season) : mockAwards;
-    return { data, source: "mock", fallback: true, message: "Dados de prêmios usando base local inicial." };
+    return { data, source: "mock", fallback: true, message: localAwardsMessage };
   }
 
   try {
@@ -23,13 +25,13 @@ export async function getAwards(season?: string): Promise<ServiceResult<AwardWin
 
     return {
       data: payload.data ?? [],
-      source: "mock",
+      source: payload.source ?? "mock",
       fallback: payload.fallback ?? true,
       empty: payload.empty ?? (payload.data?.length ?? 0) === 0,
-      message: payload.message ?? "Dados de prêmios usando base local inicial."
+      message: payload.message ?? localAwardsMessage
     };
   } catch {
     const data = season ? mockAwards.filter((award) => award.season === season) : mockAwards;
-    return { data, source: "mock", fallback: true, message: "Dados de prêmios usando base local inicial." };
+    return { data, source: "mock", fallback: true, message: localAwardsMessage };
   }
 }

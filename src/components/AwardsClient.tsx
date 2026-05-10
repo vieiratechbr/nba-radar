@@ -28,7 +28,7 @@ export function AwardsClient() {
 
       setAwards(result.data);
       setSelectedSeason((current) => current || sortedSeasons[0] || "Todas");
-      setMessage("Base local inicial. Alguns dados podem exigir atualização manual.");
+      setMessage(result.source === "espn" ? "Dados carregados online." : "Base local usada como fallback.");
       setLoading(false);
     }
 

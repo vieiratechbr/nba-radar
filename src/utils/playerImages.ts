@@ -1,5 +1,8 @@
 export const NBA_PLAYER_IMAGES: Record<string, string> = {
   "Shai Gilgeous-Alexander": "https://a.espncdn.com/i/headshots/nba/players/full/4278073.png",
+  "Cooper Flagg": "https://a.espncdn.com/i/headshots/nba/players/full/5041939.png",
+  "Keldon Johnson": "https://a.espncdn.com/i/headshots/nba/players/full/4395723.png",
+  "Nickeil Alexander-Walker": "https://a.espncdn.com/i/headshots/nba/players/full/4278039.png",
   "Stephon Castle": "https://a.espncdn.com/i/headshots/nba/players/full/4845367.png",
   "Evan Mobley": "https://a.espncdn.com/i/headshots/nba/players/full/4432158.png",
   "Dyson Daniels": "https://a.espncdn.com/i/headshots/nba/players/full/4869342.png",

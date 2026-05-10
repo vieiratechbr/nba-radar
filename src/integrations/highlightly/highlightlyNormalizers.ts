@@ -5,6 +5,7 @@ import type {
 } from "@/types/gameExtras";
 import type { GameHighlight } from "@/types/highlight";
 import type { StandingTeam } from "@/types/standing";
+import { translateHighlightText } from "@/utils/translateHighlightText";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -115,11 +116,15 @@ export function normalizeHighlightlyHighlights(raw: unknown): GameHighlight[] {
       embedUrl ||
       "";
     if (!videoUrl || !isSafeExternalUrl(videoUrl)) return;
+    const originalTitle = readString(highlight, ["title", "name", "heading"], "Melhor momento da partida");
+    const originalDescription = readString(highlight, ["description", "summary"], undefined);
 
     highlights.push({
       id: readString(highlight, ["id", "highlightId", "videoId"], `highlight-${index}`),
-      title: readString(highlight, ["title", "name", "heading"], "Melhor momento da partida"),
-      description: readString(highlight, ["description", "summary"], undefined),
+      title: translateHighlightText(originalTitle),
+      originalTitle,
+      description: translateHighlightText(originalDescription),
+      originalDescription,
       thumbnailUrl: readString(highlight, ["thumbnailUrl", "thumbnail", "image", "cover", "imgUrl"], undefined),
       videoUrl,
       embedUrl,

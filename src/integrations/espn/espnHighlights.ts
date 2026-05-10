@@ -1,4 +1,5 @@
 import type { GameHighlight } from "@/types/highlight";
+import { translateHighlightText } from "@/utils/translateHighlightText";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -148,15 +149,18 @@ export function normalizeEspnHighlights(raw: unknown): GameHighlight[] {
     const embedUrl = readEmbedUrl(item);
     if (!videoUrl && !embedUrl) return [];
 
-    const title = readString(item, ["title", "headline", "name", "text"], "Melhores momentos");
+    const originalTitle = readString(item, ["title", "headline", "name", "text"], "Melhores momentos");
+    const originalDescription = readString(item, ["description", "summary"], "");
     const dedupeKey = embedUrl || videoUrl;
     if (seen.has(dedupeKey)) return [];
     seen.add(dedupeKey);
 
     return [{
       id: readString(item, ["id", "videoId", "guid"], `espn-highlight-${index}`),
-      title,
-      description: readString(item, ["description", "summary"], ""),
+      title: translateHighlightText(originalTitle),
+      originalTitle,
+      description: translateHighlightText(originalDescription),
+      originalDescription: originalDescription || undefined,
       thumbnailUrl: readImageUrl(item),
       videoUrl: videoUrl || undefined,
       embedUrl: embedUrl || undefined,

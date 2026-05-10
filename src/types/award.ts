@@ -8,4 +8,5 @@ export type AwardWinner = {
   imageUrl?: string;
   summary?: string;
   status?: "confirmed" | "pending";
+  source?: "espn" | "mock" | "manual";
 };

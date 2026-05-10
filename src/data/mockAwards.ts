@@ -1,26 +1,74 @@
 import type { AwardWinner } from "@/types/award";
 import { getPlayerImageUrl } from "@/utils/playerImages";
 
-const pending2025Awards: AwardWinner[] = [
-  "MVP",
-  "Rookie of the Year",
-  "Defensive Player of the Year",
-  "Sixth Man of the Year",
-  "Most Improved Player",
-  "Coach of the Year",
-  "Finals MVP",
-  "Clutch Player of the Year"
-].map((award) => ({
-  id: `2025-26-${award.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`,
-  season: "2025-26",
-  award,
-  playerName: "A definir",
-  status: "pending",
-  summary: "Vencedor ainda não definido oficialmente na base local inicial."
-}));
+const pendingAwards = (season: string, awards: string[]): AwardWinner[] =>
+  awards.map((award) => ({
+    id: `${season}-${award.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`,
+    season,
+    award,
+    playerName: "A definir",
+    status: "pending",
+    source: "mock",
+    summary: "Vencedor ainda não definido oficialmente na base local inicial."
+  }));
 
 const awards: AwardWinner[] = [
-  ...pending2025Awards,
+  ...pendingAwards("2025-26", ["MVP", "Coach of the Year", "Finals MVP"]),
+  {
+    id: "2025-26-dpoy",
+    season: "2025-26",
+    award: "Defensive Player of the Year",
+    playerName: "Victor Wembanyama",
+    team: "San Antonio Spurs",
+    position: "C",
+    status: "confirmed",
+    source: "mock",
+    summary: "Listado pela ESPN em 2026 como vencedor do prêmio de defensor do ano."
+  },
+  {
+    id: "2025-26-roty",
+    season: "2025-26",
+    award: "Rookie of the Year",
+    playerName: "Cooper Flagg",
+    team: "Dallas Mavericks",
+    position: "F",
+    status: "confirmed",
+    source: "mock",
+    summary: "Listado pela ESPN em 2026 como vencedor do prêmio de novato do ano."
+  },
+  {
+    id: "2025-26-sixth",
+    season: "2025-26",
+    award: "Sixth Man of the Year",
+    playerName: "Keldon Johnson",
+    team: "San Antonio Spurs",
+    position: "F",
+    status: "confirmed",
+    source: "mock",
+    summary: "Listado pela ESPN em 2026 como vencedor do prêmio de sexto homem."
+  },
+  {
+    id: "2025-26-mip",
+    season: "2025-26",
+    award: "Most Improved Player",
+    playerName: "Nickeil Alexander-Walker",
+    team: "Atlanta Hawks",
+    position: "G",
+    status: "confirmed",
+    source: "mock",
+    summary: "Listado pela ESPN em 2026 como vencedor do prêmio de maior evolução."
+  },
+  {
+    id: "2025-26-clutch",
+    season: "2025-26",
+    award: "Clutch Player of the Year",
+    playerName: "Shai Gilgeous-Alexander",
+    team: "Oklahoma City Thunder",
+    position: "G",
+    status: "confirmed",
+    source: "mock",
+    summary: "Listado pela ESPN em 2026 como vencedor do prêmio de jogador mais decisivo."
+  },
   {
     id: "2024-25-mvp",
     season: "2024-25",
@@ -29,6 +77,7 @@ const awards: AwardWinner[] = [
     team: "Oklahoma City Thunder",
     position: "G",
     status: "confirmed",
+    source: "mock",
     summary: "Temporada de elite como principal motor ofensivo do Thunder e vencedor oficial do prêmio."
   },
   {
@@ -39,6 +88,7 @@ const awards: AwardWinner[] = [
     team: "San Antonio Spurs",
     position: "G",
     status: "confirmed",
+    source: "mock",
     summary: "Impacto imediato como novato, combinando defesa forte, criação e evolução ao longo da temporada."
   },
   {
@@ -49,6 +99,7 @@ const awards: AwardWinner[] = [
     team: "Cleveland Cavaliers",
     position: "F/C",
     status: "confirmed",
+    source: "mock",
     summary: "Pilar defensivo de Cleveland, com mobilidade, proteção de aro e cobertura em múltiplas funções."
   },
   {
@@ -59,6 +110,7 @@ const awards: AwardWinner[] = [
     team: "Boston Celtics",
     position: "G",
     status: "confirmed",
+    source: "mock",
     summary: "Energia, arremesso e condução de segunda unidade em uma das rotações mais fortes da liga."
   },
   {
@@ -69,6 +121,7 @@ const awards: AwardWinner[] = [
     team: "Atlanta Hawks",
     position: "G",
     status: "confirmed",
+    source: "mock",
     summary: "Salto de impacto defensivo, volume e presença em uma função muito maior no perímetro."
   },
   {
@@ -78,6 +131,7 @@ const awards: AwardWinner[] = [
     playerName: "Kenny Atkinson",
     team: "Cleveland Cavaliers",
     status: "confirmed",
+    source: "mock",
     summary: "Reconhecimento pela consistência coletiva, organização e campanha de alto nível de Cleveland."
   },
   {
@@ -88,6 +142,7 @@ const awards: AwardWinner[] = [
     team: "Oklahoma City Thunder",
     position: "G",
     status: "confirmed",
+    source: "mock",
     summary: "Vencedor do Bill Russell Trophy após liderar o Thunder no título da NBA."
   },
   {
@@ -98,6 +153,7 @@ const awards: AwardWinner[] = [
     team: "New York Knicks",
     position: "G",
     status: "confirmed",
+    source: "mock",
     summary: "Produção decisiva em posses apertadas e controle de jogo nos minutos finais."
   },
   {
@@ -108,6 +164,7 @@ const awards: AwardWinner[] = [
     team: "Denver Nuggets",
     position: "C",
     status: "confirmed",
+    source: "mock",
     summary: "Temporada de controle ofensivo total, eficiência e impacto como principal criador de Denver."
   },
   {
@@ -118,6 +175,7 @@ const awards: AwardWinner[] = [
     team: "San Antonio Spurs",
     position: "C",
     status: "confirmed",
+    source: "mock",
     summary: "Impacto imediato nos dois lados da quadra e produção histórica para um novato."
   },
   {
@@ -128,6 +186,7 @@ const awards: AwardWinner[] = [
     team: "Minnesota Timberwolves",
     position: "C",
     status: "confirmed",
+    source: "mock",
     summary: "Pilar defensivo de elite em uma das defesas mais fortes da liga."
   },
   {
@@ -138,6 +197,7 @@ const awards: AwardWinner[] = [
     team: "Minnesota Timberwolves",
     position: "F/C",
     status: "confirmed",
+    source: "mock",
     summary: "Pontuação, espaçamento e versatilidade saindo do banco."
   },
   {
@@ -148,6 +208,7 @@ const awards: AwardWinner[] = [
     team: "Philadelphia 76ers",
     position: "G",
     status: "confirmed",
+    source: "mock",
     summary: "Salto de volume, responsabilidade ofensiva e criação com a bola."
   },
   {
@@ -157,6 +218,7 @@ const awards: AwardWinner[] = [
     playerName: "Mark Daigneault",
     team: "Oklahoma City Thunder",
     status: "confirmed",
+    source: "mock",
     summary: "Consolidou um elenco jovem entre as forças da Conferência Oeste."
   },
   {
@@ -167,6 +229,7 @@ const awards: AwardWinner[] = [
     team: "Boston Celtics",
     position: "F",
     status: "confirmed",
+    source: "mock",
     summary: "Série decisiva com produção consistente, defesa física e presença em momentos-chave."
   },
   {
@@ -177,47 +240,8 @@ const awards: AwardWinner[] = [
     team: "Golden State Warriors",
     position: "G",
     status: "confirmed",
+    source: "mock",
     summary: "Arremessos decisivos e criação de alto nível em posses apertadas."
-  },
-  {
-    id: "2022-23-mvp",
-    season: "2022-23",
-    award: "MVP",
-    playerName: "Joel Embiid",
-    team: "Philadelphia 76ers",
-    position: "C",
-    status: "confirmed",
-    summary: "Domínio como pontuador, proteção de aro e volume de elite no ataque."
-  },
-  {
-    id: "2022-23-roty",
-    season: "2022-23",
-    award: "Rookie of the Year",
-    playerName: "Paolo Banchero",
-    team: "Orlando Magic",
-    position: "F",
-    status: "confirmed",
-    summary: "Criação ofensiva e protagonismo imediato como primeira opção jovem."
-  },
-  {
-    id: "2022-23-dpoy",
-    season: "2022-23",
-    award: "Defensive Player of the Year",
-    playerName: "Jaren Jackson Jr.",
-    team: "Memphis Grizzlies",
-    position: "F/C",
-    status: "confirmed",
-    summary: "Pressão no aro, mobilidade e impacto defensivo em múltiplas coberturas."
-  },
-  {
-    id: "2022-23-finals",
-    season: "2022-23",
-    award: "Finals MVP",
-    playerName: "Nikola Jokic",
-    team: "Denver Nuggets",
-    position: "C",
-    status: "confirmed",
-    summary: "Controle absoluto da série com passe, pontuação e leitura de jogo."
   }
 ];
 
