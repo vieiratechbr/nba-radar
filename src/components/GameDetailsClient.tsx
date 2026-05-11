@@ -147,8 +147,9 @@ export function GameDetailsClient({ gameId }: GameDetailsClientProps) {
 
   const autoRefreshEnabled = details ? shouldAutoRefreshGame(details) : false;
   const autoRefreshLabel = details ? getAutoRefreshLabel([details]) : "";
+  const refreshInterval = details?.status === "live" ? 15000 : 30000;
 
-  useAutoRefresh(() => refreshAll(true), 15000, autoRefreshEnabled);
+  useAutoRefresh(() => refreshAll(true), refreshInterval, autoRefreshEnabled);
 
   if (loading) {
     return loadingPanel("Carregando central da partida...");

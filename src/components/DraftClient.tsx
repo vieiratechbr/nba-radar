@@ -22,7 +22,11 @@ export function DraftClient() {
       if (cancelled) return;
 
       setProspects(result.data);
-      setMessage("Base local inicial de prospectos. Ranking sujeito a mudanças. Imagens podem usar fallback quando não houver foto oficial disponível.");
+      setMessage(
+        result.fallback
+          ? "Base local usada como fallback para prospects do Draft. Imagens podem usar fallback quando não houver foto oficial disponível."
+          : "Dados do Draft carregados online. Imagens podem usar fallback quando não houver foto oficial disponível."
+      );
       setLoading(false);
     }
 
@@ -38,7 +42,10 @@ export function DraftClient() {
     [prospects]
   );
   const positions = useMemo(
-    () => ["Todas", ...Array.from(new Set(prospects.map((prospect) => prospect.position)))],
+    () => [
+      "Todas",
+      ...Array.from(new Set(prospects.map((prospect) => prospect.position).filter((position): position is string => Boolean(position))))
+    ],
     [prospects]
   );
   const filteredProspects = useMemo(
@@ -124,7 +131,7 @@ export function DraftClient() {
               </span>
             </div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-court-red">
-              {prospect.year} · {prospect.position}
+              {prospect.year} · {prospect.position ?? "Posição indefinida"}
             </p>
             <h2 className="mt-3 text-2xl font-black text-white">{prospect.playerName}</h2>
             <p className="mt-2 text-sm font-semibold text-zinc-300">
@@ -149,9 +156,9 @@ export function DraftClient() {
                   ))}
                 </div>
               </div>
-              {prospect.weakness?.length ? (
+              {(prospect.weaknesses ?? prospect.weakness)?.length ? (
                 <p className="text-xs leading-5 text-zinc-500">
-                  Pontos de atenção: {prospect.weakness.join(", ")}.
+                  Pontos de atenção: {(prospect.weaknesses ?? prospect.weakness)?.join(", ")}.
                 </p>
               ) : null}
             </div>

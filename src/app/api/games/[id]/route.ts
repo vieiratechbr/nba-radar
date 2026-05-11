@@ -15,7 +15,7 @@ export async function GET(_request: NextRequest, { params }: GameSummaryRoutePro
   const { id } = await params;
 
   try {
-    const raw = await getEspnGameSummary(id);
+    const raw = await getEspnGameSummary(id, 0);
     const data = normalizeEspnGameDetails(raw);
 
     return NextResponse.json({

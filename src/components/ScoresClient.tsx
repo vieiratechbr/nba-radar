@@ -48,6 +48,10 @@ export function ScoresClient({ games, teams }: ScoresClientProps) {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const autoRefreshEnabled = useMemo(() => shouldAutoRefreshGames(visibleGames), [visibleGames]);
   const autoRefreshLabel = useMemo(() => getAutoRefreshLabel(visibleGames), [visibleGames]);
+  const refreshInterval = useMemo(
+    () => visibleGames.some((game) => game.status === "live") ? 30000 : 60000,
+    [visibleGames]
+  );
 
   const loadGames = useCallback(async (showLoading = true) => {
     if (showLoading) setLoading(true);
@@ -109,21 +113,12 @@ export function ScoresClient({ games, teams }: ScoresClientProps) {
 
   useAutoRefresh(() => {
     void loadGames(false);
-  }, 30000, autoRefreshEnabled);
+  }, refreshInterval, autoRefreshEnabled);
 
   const filteredGames = useMemo(
     () => filterGames(visibleGames, selectedStatus, selectedTeam),
     [selectedStatus, selectedTeam, visibleGames]
   );
-
-  useEffect(() => {
-    if (process.env.NODE_ENV === "production") return;
-
-    console.log("games before filters", visibleGames);
-    console.log("selectedStatus", selectedStatus);
-    console.log("selectedTeam", selectedTeam);
-    console.log("filteredGames", filteredGames);
-  }, [filteredGames, selectedStatus, selectedTeam, visibleGames]);
 
   return (
     <div className="grid gap-8">
@@ -205,10 +200,15 @@ export function ScoresClient({ games, teams }: ScoresClientProps) {
         </div>
       ) : null}
 
-      {autoRefreshEnabled ? (
-        <div className="rounded-lg border border-emerald-400/20 bg-emerald-400/10 p-3 text-xs font-bold text-emerald-200">
-          {autoRefreshLabel || "Atualização automática ativa"}
-          {lastUpdated ? ` · Última atualização: ${formatLastUpdated(lastUpdated)}` : ""}
+      {lastUpdated ? (
+        <div className={`rounded-lg border p-3 text-xs font-bold ${
+          autoRefreshEnabled
+            ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-200"
+            : "border-white/10 bg-white/[0.03] text-zinc-400"
+        }`}
+        >
+          {autoRefreshLabel}
+          {` · Última atualização: ${formatLastUpdated(lastUpdated)}`}
         </div>
       ) : null}
 

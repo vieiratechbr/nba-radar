@@ -31,6 +31,10 @@ export function ScoreboardSection({
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const autoRefreshEnabled = useMemo(() => shouldAutoRefreshGames(visibleGames), [visibleGames]);
   const autoRefreshLabel = useMemo(() => getAutoRefreshLabel(visibleGames), [visibleGames]);
+  const refreshInterval = useMemo(
+    () => visibleGames.some((game) => game.status === "live") ? 30000 : 60000,
+    [visibleGames]
+  );
 
   const loadTodayGames = useCallback(async () => {
     const result = await getTodayGamesResult();
@@ -64,7 +68,7 @@ export function ScoreboardSection({
 
   useAutoRefresh(() => {
     void loadTodayGames();
-  }, 30000, autoRefreshEnabled);
+  }, refreshInterval, autoRefreshEnabled);
 
   return (
     <section>
@@ -92,10 +96,15 @@ export function ScoreboardSection({
           {emptyMessage}
         </div>
       ) : null}
-      {autoRefreshEnabled ? (
-        <div className="mb-5 rounded-lg border border-emerald-400/20 bg-emerald-400/10 p-3 text-xs font-bold text-emerald-200">
-          {autoRefreshLabel || "Atualização automática ativa"}
-          {lastUpdated ? ` · Última atualização: ${formatLastUpdated(lastUpdated)}` : ""}
+      {lastUpdated ? (
+        <div className={`mb-5 rounded-lg border p-3 text-xs font-bold ${
+          autoRefreshEnabled
+            ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-200"
+            : "border-white/10 bg-white/[0.03] text-zinc-400"
+        }`}
+        >
+          {autoRefreshLabel}
+          {` · Última atualização: ${formatLastUpdated(lastUpdated)}`}
         </div>
       ) : null}
       {visibleGames.length > 0 ? (

@@ -26,7 +26,7 @@ export async function getEspnGameSummary(eventId: string, revalidate = 10) {
   const url = new URL(espnEndpoints.nbaSummary);
   url.searchParams.set("event", eventId);
 
-  return espnFetch(url.toString(), { revalidate });
+  return espnFetch(url.toString(), { revalidate, noStore: revalidate <= 0 });
 }
 
 export async function getEspnNews() {
@@ -57,7 +57,7 @@ export async function getRawEspnScoreboard(date?: Date | string, revalidate = 30
   return {
     requestedDate: formattedDate,
     url: url.toString(),
-    data: await espnFetch(url.toString(), { revalidate })
+    data: await espnFetch(url.toString(), { revalidate, noStore: revalidate <= 0 })
   };
 }
 

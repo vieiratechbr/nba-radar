@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "NBA Radar",
+    "slug": "nba-radar-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/logos/logo.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/logos/logotext.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#050608"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logos/logo.png",
+        "backgroundColor": "#050608"
+      }
+    }
+  }
+}

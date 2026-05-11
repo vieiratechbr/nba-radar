@@ -1,7 +1,7 @@
 import type { Game } from "@/types/game";
 import type { GameDetails } from "@/types/gameDetails";
 
-const nearStartBeforeMs = 10 * 60 * 1000;
+const nearStartBeforeMs = 30 * 60 * 1000;
 const nearStartAfterMs = 180 * 60 * 1000;
 
 type RefreshableGame = Pick<Game | GameDetails, "date" | "status">;
@@ -30,5 +30,5 @@ export function getAutoRefreshLabel(games: RefreshableGame[]) {
     return "Aguardando atualização da fonte";
   }
 
-  return "";
+  return "Atualização automática pausada";
 }

@@ -1,6 +1,10 @@
-export async function espnFetch(url: string, options?: { revalidate?: number }) {
+export async function espnFetch(url: string, options?: { revalidate?: number; noStore?: boolean }) {
+  const cacheOptions = options?.noStore
+    ? { cache: "no-store" as const }
+    : { next: { revalidate: options?.revalidate ?? 60 } };
+
   const response = await fetch(url, {
-    next: { revalidate: options?.revalidate ?? 60 },
+    ...cacheOptions,
     headers: {
       Accept: "application/json"
     }

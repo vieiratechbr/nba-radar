@@ -90,16 +90,22 @@ export function GameHeader({
           type="button"
           onClick={onRefresh}
           disabled={refreshing}
-          className="inline-flex w-fit items-center gap-2 rounded-full bg-court-red px-4 py-2 text-sm font-black text-white shadow-[0_14px_35px_rgba(215,25,32,0.22)] transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+          title="Atualizar agora"
+          className="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3 py-2 text-xs font-bold text-zinc-300 transition hover:border-court-red/50 hover:bg-court-red/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
         >
           <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} aria-hidden="true" />
-          Atualizar dados
+          Atualizar agora
         </button>
       </div>
 
-      {autoRefreshEnabled ? (
-        <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 p-3 text-xs font-bold text-emerald-200">
-          {autoRefreshLabel || "Atualização automática ativa"}
+      {lastUpdated ? (
+        <div className={`rounded-xl border p-3 text-xs font-bold ${
+          autoRefreshEnabled
+            ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-200"
+            : "border-white/10 bg-white/[0.03] text-zinc-400"
+        }`}
+        >
+          {autoRefreshLabel}
           {lastUpdated ? ` · Última atualização: ${formatLastUpdated(lastUpdated)}` : ""}
         </div>
       ) : null}

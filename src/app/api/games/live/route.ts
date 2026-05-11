@@ -17,7 +17,7 @@ export async function GET() {
   const requestedDate = getNbaTodayDate();
 
   try {
-    const result = await getRawEspnScoreboard(requestedDate, 15);
+    const result = await getRawEspnScoreboard(requestedDate, 0);
     const allGames = normalizeEspnGames(result.data);
     const games = allGames.filter((game) => game.status === "live");
 

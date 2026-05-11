@@ -12,8 +12,18 @@ export function useAutoRefresh(callback: () => void | Promise<void>, intervalMs:
       }
     };
 
-    const intervalId = window.setInterval(tick, intervalMs);
+    tick();
 
-    return () => window.clearInterval(intervalId);
+    const intervalId = window.setInterval(tick, intervalMs);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") tick();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [callback, enabled, intervalMs]);
 }
