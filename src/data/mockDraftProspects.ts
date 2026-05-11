@@ -1,6 +1,7 @@
 import type { DraftProspect } from "@/types/draft";
 import { getDraftPlayerImageUrl } from "@/utils/draftPlayerImages";
 
+// TODO: substituir esta base local por uma fonte online confiável de prospects pré-draft.
 const prospects: DraftProspect[] = [
   {
     id: "2026-aj-dybantsa",
@@ -126,5 +127,7 @@ const prospects: DraftProspect[] = [
 
 export const mockDraftProspects: DraftProspect[] = prospects.map((prospect) => ({
   ...prospect,
+  source: "mock",
+  weaknesses: prospect.weaknesses ?? prospect.weakness,
   imageUrl: getDraftPlayerImageUrl(prospect.playerName, prospect.imageUrl)
 }));

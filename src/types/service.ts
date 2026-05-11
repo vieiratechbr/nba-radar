@@ -1,6 +1,6 @@
 export interface ServiceResult<T> {
   data: T;
-  source: "espn" | "api" | "mock";
+  source: "espn" | "highlightly" | "api" | "mock";
   error?: string;
   message?: string;
   empty?: boolean;

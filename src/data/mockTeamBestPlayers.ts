@@ -1,6 +1,7 @@
 import { getPlayerImageUrl } from "@/utils/playerImages";
 import type { TeamBestPlayer } from "@/types/favoriteTeam";
 
+// TODO: trocar por estatísticas individuais online quando houver endpoint confiável por equipe/temporada.
 const localBestPlayers: Record<string, Omit<TeamBestPlayer, "teamAbbreviation" | "source">> = {
   OKC: {
     name: "Shai Gilgeous-Alexander",
