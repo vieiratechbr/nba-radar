@@ -5,7 +5,7 @@ import type { ServiceResult } from "@/types/service";
 type DraftApiPayload = {
   data?: DraftProspect[];
   fallback?: boolean;
-  source?: "mock";
+  source?: "espn" | "highlightly" | "mock";
   message?: string;
   empty?: boolean;
 };
@@ -25,10 +25,14 @@ export async function getDraftProspects(year?: string): Promise<ServiceResult<Dr
 
     return {
       data: payload.data ?? [],
-      source: "mock",
+      source: payload.source ?? "mock",
       fallback: payload.fallback ?? true,
       empty: payload.empty ?? (payload.data?.length ?? 0) === 0,
-      message: payload.message ?? "Prospectos usando base local inicial."
+      message: payload.message ?? (
+        payload.source === "espn"
+          ? "Draft carregado online."
+          : "Base local usada como fallback para prospects do Draft."
+      )
     };
   } catch {
     const data = year
