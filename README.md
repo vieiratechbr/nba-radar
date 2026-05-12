@@ -102,20 +102,6 @@ NEWSAPI_KEY=
 EXPO_PUBLIC_API_BASE_URL=
 ```
 
-
-## Banco de dados
-
-O projeto usa Supabase como backend principal para autenticação, perfis de usuários, time favorito, preferências, jogos salvos e jogadores favoritos. O schema inicial está em [`supabase/schema.sql`](supabase/schema.sql) e deve ser aplicado no SQL Editor do Supabase.
-
-Passos recomendados:
-
-1. Criar um projeto no Supabase;
-2. Copiar a Project URL e a anon public key;
-3. Preencher `.env.local` com as variáveis Supabase;
-4. Rodar o SQL de [`supabase/schema.sql`](supabase/schema.sql) no SQL Editor do Supabase.
-
-Leia mais em [`docs/database.md`](docs/database.md).
-
 ## Rodando localmente
 
 Instale as dependências e inicie o servidor web:
