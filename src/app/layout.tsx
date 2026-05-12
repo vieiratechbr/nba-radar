@@ -4,6 +4,7 @@ import "@/app/globals.css";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { TeamThemeProvider } from "@/components/theme/TeamThemeProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
 import { getCurrentProfile } from "@/services/profileService";
 
 export const metadata: Metadata = {
@@ -21,16 +22,18 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
-  const { profile } = await getCurrentProfile();
+  const { user, profile } = await getCurrentProfile();
 
   return (
     <html lang="pt-BR">
       <body>
-        <TeamThemeProvider abbreviation={profile?.favorite_team_abbreviation}>
-          <Header />
-          <main>{children}</main>
-          <Footer />
-        </TeamThemeProvider>
+        <AuthProvider initialUser={user} initialProfile={profile}>
+          <TeamThemeProvider>
+            <Header />
+            <main>{children}</main>
+            <Footer />
+          </TeamThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

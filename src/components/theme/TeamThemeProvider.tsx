@@ -1,4 +1,7 @@
+"use client";
+
 import type { CSSProperties, ReactNode } from "react";
+import { useAuth } from "@/providers/AuthProvider";
 import { getTeamTheme, hexToRgb } from "@/theme/nbaTeamThemes";
 
 type TeamThemeCssProperties = CSSProperties & {
@@ -12,12 +15,12 @@ type TeamThemeCssProperties = CSSProperties & {
 };
 
 interface TeamThemeProviderProps {
-  abbreviation?: string | null;
   children: ReactNode;
 }
 
-export function TeamThemeProvider({ abbreviation, children }: TeamThemeProviderProps) {
-  const theme = getTeamTheme(abbreviation);
+export function TeamThemeProvider({ children }: TeamThemeProviderProps) {
+  const { profile } = useAuth();
+  const theme = getTeamTheme(profile?.favorite_team_abbreviation);
   const accent = theme.accent ?? "#FFFFFF";
   const textOnPrimary = theme.textOnPrimary ?? "#FFFFFF";
 
@@ -31,5 +34,9 @@ export function TeamThemeProvider({ abbreviation, children }: TeamThemeProviderP
     "--team-accent-rgb": hexToRgb(accent)
   };
 
-  return <div style={style}>{children}</div>;
+  return (
+    <div data-team-theme={theme.abbreviation || "default"} style={style}>
+      {children}
+    </div>
+  );
 }

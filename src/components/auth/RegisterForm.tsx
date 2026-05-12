@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { useAuth } from "@/providers/AuthProvider";
 import { register } from "@/services/authService";
 
 export function RegisterForm() {
   const router = useRouter();
+  const { refreshProfile } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,12 +33,13 @@ export function RegisterForm() {
       const result = await register(name, email, password);
 
       if (result.needsEmailConfirmation) {
-        setMessage(result.message ?? "Conta criada. Confirme seu email para entrar.");
+        setMessage(result.message ?? "Cadastro criado. Verifique seu e-mail para confirmar a conta.");
         return;
       }
 
-      router.push("/onboarding/time-favorito");
+      await refreshProfile();
       router.refresh();
+      router.push("/onboarding/time-favorito");
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Não foi possível criar a conta.");
     } finally {
@@ -73,7 +76,7 @@ export function RegisterForm() {
           onChange={(event) => setName(event.target.value)}
           required
           autoComplete="name"
-          className="rounded-md border border-white/10 bg-court-black px-4 py-3 text-white outline-none transition focus:border-court-red"
+          className="rounded-md border border-white/10 bg-court-black px-4 py-3 text-white outline-none transition focus:border-[var(--team-primary)]"
         />
       </label>
 
@@ -85,7 +88,7 @@ export function RegisterForm() {
           onChange={(event) => setEmail(event.target.value)}
           required
           autoComplete="email"
-          className="rounded-md border border-white/10 bg-court-black px-4 py-3 text-white outline-none transition focus:border-court-red"
+          className="rounded-md border border-white/10 bg-court-black px-4 py-3 text-white outline-none transition focus:border-[var(--team-primary)]"
         />
       </label>
 
@@ -98,7 +101,7 @@ export function RegisterForm() {
           required
           minLength={6}
           autoComplete="new-password"
-          className="rounded-md border border-white/10 bg-court-black px-4 py-3 text-white outline-none transition focus:border-court-red"
+          className="rounded-md border border-white/10 bg-court-black px-4 py-3 text-white outline-none transition focus:border-[var(--team-primary)]"
         />
       </label>
 
@@ -111,21 +114,21 @@ export function RegisterForm() {
           required
           minLength={6}
           autoComplete="new-password"
-          className="rounded-md border border-white/10 bg-court-black px-4 py-3 text-white outline-none transition focus:border-court-red"
+          className="rounded-md border border-white/10 bg-court-black px-4 py-3 text-white outline-none transition focus:border-[var(--team-primary)]"
         />
       </label>
 
       <button
         type="submit"
         disabled={loading}
-        className="rounded-full bg-court-red px-5 py-3 text-sm font-black text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+        className="rounded-full bg-[var(--team-primary)] px-5 py-3 text-sm font-black text-[var(--team-text-on-primary)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? "Criando conta..." : "Criar conta"}
       </button>
 
       <p className="text-sm text-zinc-400">
         Já tem conta?{" "}
-        <Link href="/login" className="font-bold text-white transition hover:text-court-red">
+        <Link href="/login" className="font-bold text-white transition hover:text-[var(--team-primary)]">
           Entrar
         </Link>
       </p>

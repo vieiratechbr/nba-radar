@@ -49,6 +49,10 @@ async function updateFavoriteTeam(request: NextRequest) {
 
     return NextResponse.json({ data: profile });
   } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[profile] favorite team API error:", error);
+    }
+
     return NextResponse.json(
       {
         error: error instanceof Error ? error.message : "Não foi possível salvar o time favorito."

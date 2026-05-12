@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { TeamBadge } from "@/components/TeamBadge";
+import { useAuth } from "@/providers/AuthProvider";
 import { getTeamTheme } from "@/theme/nbaTeamThemes";
 import type { Team } from "@/types/team";
 
@@ -16,6 +17,7 @@ function fullTeamName(team: Team) {
 
 export function FavoriteTeamSelector({ teams }: FavoriteTeamSelectorProps) {
   const router = useRouter();
+  const { user, refreshProfile } = useAuth();
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +30,11 @@ export function FavoriteTeamSelector({ teams }: FavoriteTeamSelectorProps) {
   async function saveFavoriteTeam() {
     if (!selectedTeam) {
       setError("Selecione um time para continuar.");
+      return;
+    }
+
+    if (!user) {
+      setError("Você precisa estar logado para escolher um time favorito.");
       return;
     }
 
@@ -54,9 +61,17 @@ export function FavoriteTeamSelector({ teams }: FavoriteTeamSelectorProps) {
         throw new Error(payload.error ?? "Não foi possível salvar o time favorito.");
       }
 
-      router.push("/perfil");
+      if (process.env.NODE_ENV === "development") {
+        console.log("[profile] favorite team:", selectedTeam.abbreviation);
+      }
+
+      await refreshProfile();
       router.refresh();
+      router.push("/perfil");
     } catch (requestError) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("[profile] favorite team update failed:", requestError);
+      }
       setError(requestError instanceof Error ? requestError.message : "Não foi possível salvar o time favorito.");
     } finally {
       setSaving(false);

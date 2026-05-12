@@ -43,3 +43,20 @@ img {
 .text-balance {
   text-wrap: balance;
 }
+
+.team-accent-bg {
+  background-color: var(--team-primary);
+  color: var(--team-text-on-primary);
+}
+
+.team-accent-border {
+  border-color: var(--team-primary);
+}
+
+.team-accent-text {
+  color: var(--team-primary);
+}
+
+.team-accent-glow {
+  box-shadow: 0 0 32px color-mix(in srgb, var(--team-primary) 24%, transparent);
+}

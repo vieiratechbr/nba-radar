@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       needsEmailConfirmation: !data.session,
       message: data.session
         ? "Conta criada. Escolha seu time favorito."
-        : "Conta criada. Confirme seu email para entrar no NBA Radar."
+        : "Cadastro criado. Verifique seu e-mail para confirmar a conta."
     });
   } catch (error) {
     return NextResponse.json(
