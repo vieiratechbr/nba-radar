@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import "@/app/globals.css";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { TeamThemeProvider } from "@/components/theme/TeamThemeProvider";
+import { getCurrentProfile } from "@/services/profileService";
 
 export const metadata: Metadata = {
   title: {
@@ -18,13 +20,17 @@ export const metadata: Metadata = {
   }
 };
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+  const { profile } = await getCurrentProfile();
+
   return (
     <html lang="pt-BR">
       <body>
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <TeamThemeProvider abbreviation={profile?.favorite_team_abbreviation}>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </TeamThemeProvider>
       </body>
     </html>
   );

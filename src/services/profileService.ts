@@ -117,3 +117,23 @@ export async function updateFavoriteTeamForCurrentUser(team: FavoriteTeamProfile
     ...team
   });
 }
+
+export async function createProfile(input: ProfileUpsertInput): Promise<UserProfile | null> {
+  return upsertProfile(input);
+}
+
+export async function updateProfile(input: Partial<Omit<ProfileUpsertInput, "id">>): Promise<UserProfile | null> {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Usuário não autenticado.");
+
+  return upsertProfile({
+    id: user.id,
+    email: input.email ?? user.email ?? null,
+    name: input.name ?? user.name ?? null,
+    ...input
+  });
+}
+
+export async function updateFavoriteTeam(team: FavoriteTeamProfileInput) {
+  return updateFavoriteTeamForCurrentUser(team);
+}
