@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getProfileByUserId, upsertProfile } from "@/services/profileService";
+import { upsertPreferences } from "@/services/preferencesService";
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,6 +37,8 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    const preferences = await upsertPreferences({}, data.user.id);
+
     return NextResponse.json({
       user: {
         id: data.user.id,
@@ -43,6 +46,7 @@ export async function POST(request: NextRequest) {
         name: profile?.name ?? undefined
       },
       profile,
+      preferences,
       needsFavoriteTeam: !profile?.favorite_team_id
     });
   } catch (error) {

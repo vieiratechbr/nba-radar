@@ -34,6 +34,11 @@ Em dispositivos físicos, troque `localhost` pelo IP da máquina na rede local.
 - `src/theme`: cores, espaçamentos e tipografia.
 - `assets/logos`: logos oficiais do NBA Radar.
 
+
+## Supabase compartilhado
+
+O app mobile usará o mesmo Supabase Auth e as mesmas tabelas de `profiles`/`user_preferences` do projeto web. A base de dados e as policies RLS ficam documentadas em `../supabase/schema.sql` e `../docs/database.md`.
+
 ## Rotas esperadas do backend web
 
 - `GET /api/games/today`
