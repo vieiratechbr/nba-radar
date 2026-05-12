@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { LayoutWrapper } from "@/components/LayoutWrapper";
 
-const footerLinks = [
+const navigationLinks = [
   { href: "/", label: "Início" },
   { href: "/placares", label: "Placares" },
   { href: "/classificacao", label: "Classificação" },
@@ -10,10 +10,17 @@ const footerLinks = [
   { href: "/draft", label: "Draft" }
 ];
 
+const institutionalLinks = [
+  { href: "/sobre", label: "Sobre" },
+  { href: "/privacidade", label: "Política de Privacidade" },
+  { href: "/termos", label: "Termos de Uso" },
+  { href: "/contato", label: "Contato" }
+];
+
 export function Footer() {
   return (
     <footer className="mt-20 border-t border-white/10 bg-black/30">
-      <LayoutWrapper className="grid gap-10 py-10 md:grid-cols-[1.4fr_1fr]">
+      <LayoutWrapper className="grid gap-10 py-10 lg:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <Link
             href="/"
@@ -36,16 +43,38 @@ export function Footer() {
           </p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          {footerLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-semibold text-zinc-400 transition hover:text-white"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div>
+          <p className="mb-4 text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
+            Navegação
+          </p>
+          <div className="grid gap-3">
+            {navigationLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm font-semibold text-zinc-400 transition hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="mb-4 text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
+            Institucional
+          </p>
+          <div className="grid gap-3">
+            {institutionalLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm font-semibold text-zinc-400 transition hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </LayoutWrapper>
     </footer>

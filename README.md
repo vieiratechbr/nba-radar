@@ -146,6 +146,17 @@ Leia mais em [`docs/data-sources.md`](docs/data-sources.md).
 
 O NBA Radar mantém uma identidade escura/premium e aplica as cores do time favorito como accents visuais em botões, bordas, badges, cards do painel, seção “Seu Radar” e destaques ativos. O mapa de cores das franquias fica em [`src/theme/nbaTeamThemes.ts`](src/theme/nbaTeamThemes.ts), e a documentação dedicada está em [`docs/team-themes.md`](docs/team-themes.md).
 
+## Páginas institucionais
+
+O projeto possui páginas de:
+
+- Sobre;
+- Política de Privacidade;
+- Termos de Uso;
+- Contato.
+
+Essas páginas ajudam a preparar o projeto para uso público, deploy, autenticação de usuários e futura monetização.
+
 ## Roadmap
 
 - Melhorar painel do usuário;

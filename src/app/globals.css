@@ -60,3 +60,73 @@ img {
 .team-accent-glow {
   box-shadow: 0 0 32px color-mix(in srgb, var(--team-primary) 24%, transparent);
 }
+
+.legal-content {
+  color: #d4d4d8;
+}
+
+.legal-content section {
+  padding: 1.5rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.legal-content section:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.legal-content section:last-child {
+  padding-bottom: 0;
+}
+
+.legal-content h2 {
+  margin-bottom: 0.75rem;
+  color: #fff;
+  font-size: 1.125rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+.legal-content p {
+  color: #a7aab3;
+  line-height: 1.8;
+}
+
+.legal-content ul {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+  color: #d4d4d8;
+}
+
+.legal-content li {
+  position: relative;
+  padding-left: 1.15rem;
+  line-height: 1.7;
+}
+
+.legal-content li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72rem;
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 999px;
+  background: var(--team-primary);
+  box-shadow: 0 0 16px rgba(var(--team-primary-rgb), 0.38);
+}
+
+.legal-content a {
+  color: #fff;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-color: rgba(var(--team-primary-rgb), 0.5);
+  text-underline-offset: 0.2rem;
+  transition: color 160ms ease, text-decoration-color 160ms ease;
+}
+
+.legal-content a:hover {
+  color: var(--team-primary);
+  text-decoration-color: var(--team-primary);
+}
