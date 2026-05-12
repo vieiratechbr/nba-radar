@@ -57,7 +57,7 @@ export function Header() {
                 className={clsx(
                   "rounded-full px-4 py-2 text-sm font-semibold transition",
                   active
-                    ? "bg-white text-court-black"
+                    ? "bg-[var(--team-primary)] text-[var(--team-text-on-primary)] shadow-[0_0_30px_rgba(var(--team-primary-rgb),0.25)]"
                     : "text-zinc-300 hover:bg-white/10 hover:text-white"
                 )}
               >
@@ -70,7 +70,7 @@ export function Header() {
         <div className="hidden items-center gap-3 lg:flex">
           <Link
             href="/placares"
-            className="inline-flex items-center gap-2 rounded-full bg-court-red px-4 py-2 text-sm font-bold text-white transition hover:bg-red-600"
+            className="inline-flex items-center gap-2 rounded-full bg-[var(--team-primary)] px-4 py-2 text-sm font-bold text-[var(--team-text-on-primary)] shadow-[0_0_30px_rgba(var(--team-primary-rgb),0.22)] transition hover:brightness-110"
           >
             <BarChart3 className="h-4 w-4" aria-hidden="true" />
             Ver jogos de hoje
@@ -104,7 +104,7 @@ export function Header() {
               ))}
               <Link
                 href="/placares"
-                className="mt-2 inline-flex items-center justify-center gap-2 rounded-md bg-court-red px-4 py-3 text-sm font-bold text-white"
+                className="mt-2 inline-flex items-center justify-center gap-2 rounded-md bg-[var(--team-primary)] px-4 py-3 text-sm font-bold text-[var(--team-text-on-primary)]"
                 onClick={() => setOpen(false)}
               >
                 <BarChart3 className="h-4 w-4" aria-hidden="true" />

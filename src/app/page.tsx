@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BarChart3, Medal, Table2, Target } from "lucide-react";
+import { ArrowRight, BarChart3, Medal, Table2, Target, UserPlus } from "lucide-react";
 import { FavoriteTeamCard } from "@/components/favorite-team/FavoriteTeamCard";
 import { HeroSection } from "@/components/HeroSection";
 import { LayoutWrapper } from "@/components/LayoutWrapper";
@@ -54,7 +54,30 @@ export default async function HomePage() {
       <HeroSection />
 
       <LayoutWrapper className="grid gap-16 py-12 sm:py-16">
-        {favoriteDashboard ? <FavoriteTeamCard data={favoriteDashboard} /> : null}
+        {favoriteDashboard ? (
+          <FavoriteTeamCard data={favoriteDashboard} />
+        ) : (
+          <section className="rounded-2xl border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(var(--team-primary-rgb),0.18),transparent_28rem),#111217] p-5 shadow-glow">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3">
+                <span className="grid h-12 w-12 place-items-center rounded-full bg-[rgba(var(--team-primary-rgb),0.16)] text-[var(--team-primary)]">
+                  <UserPlus className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-court-red">Personalização</p>
+                  <h2 className="mt-1 text-xl font-black text-white">Crie sua conta e personalize o NBA Radar com seu time favorito.</h2>
+                </div>
+              </div>
+              <Link
+                href="/cadastro"
+                className="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-white transition hover:border-[var(--team-primary)] hover:text-[var(--team-primary)]"
+              >
+                Criar conta
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
+          </section>
+        )}
 
         <ScoreboardSection games={[]} teams={[]} />
 
@@ -72,14 +95,14 @@ export default async function HomePage() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group rounded-lg border border-white/10 bg-white/[0.03] p-5 transition hover:-translate-y-1 hover:border-court-red/60 hover:bg-white/[0.06] hover:shadow-glow"
+                  className="group rounded-lg border border-white/10 bg-white/[0.03] p-5 transition hover:-translate-y-1 hover:border-[var(--team-primary)] hover:bg-white/[0.06] hover:shadow-glow"
                 >
-                  <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-court-red/20 text-court-red">
+                  <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-[rgba(var(--team-primary-rgb),0.16)] text-[var(--team-primary)]">
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <h2 className="text-xl font-black text-white">{item.title}</h2>
                   <p className="mt-2 text-sm leading-6 text-zinc-400">{item.description}</p>
-                  <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-white transition group-hover:text-court-red">
+                  <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-white transition group-hover:text-[var(--team-primary)]">
                     Abrir
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </span>

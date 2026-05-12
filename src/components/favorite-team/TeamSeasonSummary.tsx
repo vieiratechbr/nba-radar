@@ -3,9 +3,9 @@ import type { StandingTeam } from "@/types/standing";
 
 export function TeamSeasonSummary({ standing }: { standing: StandingTeam | null }) {
   return (
-    <section className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
+    <section className="rounded-lg border border-[rgba(var(--team-primary-rgb),0.28)] bg-white/[0.03] p-5 shadow-[0_0_46px_rgba(var(--team-primary-rgb),0.06)]">
       <div className="mb-4 flex items-center gap-2">
-        <Table2 className="h-5 w-5 text-court-red" aria-hidden="true" />
+        <Table2 className="h-5 w-5 text-[var(--team-primary)]" aria-hidden="true" />
         <h2 className="text-xl font-black text-white">Temporada do time</h2>
       </div>
 

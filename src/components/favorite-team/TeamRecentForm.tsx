@@ -11,9 +11,9 @@ export function TeamRecentForm({
   form: ("V" | "D" | "-")[];
 }) {
   return (
-    <section className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
+    <section className="rounded-lg border border-[rgba(var(--team-primary-rgb),0.28)] bg-white/[0.03] p-5 shadow-[0_0_46px_rgba(var(--team-primary-rgb),0.06)]">
       <div className="mb-4 flex items-center gap-2">
-        <History className="h-5 w-5 text-court-red" aria-hidden="true" />
+        <History className="h-5 w-5 text-[var(--team-primary)]" aria-hidden="true" />
         <h2 className="text-xl font-black text-white">Últimos resultados</h2>
       </div>
 
@@ -26,7 +26,7 @@ export function TeamRecentForm({
                 result === "V"
                   ? "bg-emerald-400/15 text-emerald-200"
                   : result === "D"
-                  ? "bg-court-red/15 text-red-200"
+                  ? "bg-[rgba(var(--team-primary-rgb),0.15)] text-red-200"
                   : "bg-white/10 text-zinc-300"
               }`}
             >
@@ -42,7 +42,7 @@ export function TeamRecentForm({
             <Link
               key={item.id}
               href={item.href}
-              className="flex items-center justify-between gap-3 rounded-md border border-white/10 bg-black/20 p-4 text-sm transition hover:border-court-red/60 hover:bg-black/35"
+              className="flex items-center justify-between gap-3 rounded-md border border-white/10 bg-black/20 p-4 text-sm transition hover:border-[var(--team-primary)] hover:bg-black/35"
             >
               <div>
                 <p className="font-black text-white">
