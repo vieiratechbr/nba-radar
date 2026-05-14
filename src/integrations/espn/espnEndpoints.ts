@@ -4,5 +4,7 @@ export const espnEndpoints = {
   nbaTeams: "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams",
   nbaSummary: "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary",
   nbaStandings: "https://site.web.api.espn.com/apis/v2/sports/basketball/nba/standings",
-  nbaStandingsAlt: "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/standings"
+  nbaStandingsAlt: "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/standings",
+  nbaTeamRoster: "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams",
+  nbaTeamStatistics: "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams"
 } as const;

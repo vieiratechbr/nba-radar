@@ -53,7 +53,7 @@ export function PlayerAvatar({ name, imageUrl, size = "md" }: PlayerAvatarProps)
 
   return (
     <div
-      className={`${sizeClasses[size]} grid place-items-center rounded-full border border-court-red/40 bg-[radial-gradient(circle_at_top,rgba(215,25,32,0.34),rgba(14,15,20,0.96))] font-black text-white shadow-lg`}
+      className={`${sizeClasses[size]} grid place-items-center rounded-full border border-[rgba(var(--team-primary-rgb),0.4)] bg-[radial-gradient(circle_at_top,rgba(var(--team-primary-rgb),0.34),rgba(14,15,20,0.96))] font-black text-white shadow-lg`}
       title={name}
     >
       {initials}

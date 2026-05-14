@@ -1,13 +1,37 @@
 import { getPlayerImageUrl } from "@/utils/playerImages";
 import type { TeamBestPlayer } from "@/types/favoriteTeam";
 
-// TODO: trocar por estatísticas individuais online quando houver endpoint confiável por equipe/temporada.
+// TODO: substituir por estatísticas individuais online quando houver endpoint confiável por equipe/temporada.
 const localBestPlayers: Record<string, Omit<TeamBestPlayer, "teamAbbreviation" | "source">> = {
   OKC: {
     name: "Shai Gilgeous-Alexander",
     position: "G",
     imageUrl: getPlayerImageUrl("Shai Gilgeous-Alexander"),
     summary: "Base local inicial. Estatísticas detalhadas ainda dependem de integração dedicada."
+  },
+  CHA: {
+    name: "LaMelo Ball",
+    position: "G",
+    imageUrl: getPlayerImageUrl("LaMelo Ball"),
+    summary: "Base local inicial. Usado como destaque visual enquanto estatísticas individuais online não são consolidadas."
+  },
+  LAL: {
+    name: "LeBron James",
+    position: "F",
+    imageUrl: getPlayerImageUrl("LeBron James"),
+    summary: "Base local inicial. Usado como destaque visual enquanto estatísticas individuais online não são consolidadas."
+  },
+  CHI: {
+    name: "Coby White",
+    position: "G",
+    imageUrl: getPlayerImageUrl("Coby White"),
+    summary: "Base local inicial. Usado como destaque visual enquanto estatísticas individuais online não são consolidadas."
+  },
+  GSW: {
+    name: "Stephen Curry",
+    position: "G",
+    imageUrl: getPlayerImageUrl("Stephen Curry"),
+    summary: "Base local inicial. Usado como destaque visual enquanto estatísticas individuais online não são consolidadas."
   },
   DEN: {
     name: "Nikola Jokic",
@@ -18,6 +42,7 @@ const localBestPlayers: Record<string, Omit<TeamBestPlayer, "teamAbbreviation" |
   BOS: {
     name: "Jayson Tatum",
     position: "F",
+    imageUrl: getPlayerImageUrl("Jayson Tatum"),
     summary: "Base local inicial. Estatísticas detalhadas ainda dependem de integração dedicada."
   },
   DAL: {

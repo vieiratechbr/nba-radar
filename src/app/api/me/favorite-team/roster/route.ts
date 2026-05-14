@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getFavoriteTeamDashboard } from "@/services/favoriteTeamService";
+import { getEspnTeamRoster } from "@/integrations/espn/espnRoster";
 import { getCurrentProfile } from "@/services/profileService";
 
 export const dynamic = "force-dynamic";
@@ -11,30 +11,29 @@ export async function GET() {
     return NextResponse.json({ error: "Usuário não autenticado." }, { status: 401 });
   }
 
-  if (!profile?.favorite_team_id) {
-    return NextResponse.json(
-      { error: "Time favorito ainda não definido." },
-      { status: 400 }
-    );
+  const abbreviation = profile?.favorite_team_abbreviation;
+
+  if (!abbreviation) {
+    return NextResponse.json({ error: "Time favorito ainda não definido." }, { status: 400 });
   }
 
   try {
-    const data = await getFavoriteTeamDashboard(profile);
-
+    const data = await getEspnTeamRoster(abbreviation);
     return NextResponse.json({
       data,
-      sources: data?.sources,
-      source: data?.source,
-      message: data?.message
+      source: data.length ? "espn" : "unavailable",
+      fallback: false
     });
   } catch (error) {
     return NextResponse.json(
       {
-        data: null,
-        message: "Não foi possível carregar sua área personalizada agora.",
+        data: [],
+        source: "unavailable",
+        fallback: false,
+        message: "Elenco ainda indisponível.",
         error: error instanceof Error ? error.message : "Erro desconhecido."
       },
-      { status: 500 }
+      { status: 200 }
     );
   }
 }

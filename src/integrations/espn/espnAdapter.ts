@@ -61,6 +61,19 @@ export async function getRawEspnScoreboard(date?: Date | string, revalidate = 30
   };
 }
 
+export async function getRawEspnScoreboardRange(startDate: Date | string, endDate: Date | string, revalidate = 300) {
+  const formattedStartDate = formatNbaApiDate(startDate);
+  const formattedEndDate = formatNbaApiDate(endDate);
+  const url = new URL(espnEndpoints.nbaScoreboard);
+  url.searchParams.set("dates", `${formattedStartDate}-${formattedEndDate}`);
+
+  return {
+    requestedDate: `${formattedStartDate}-${formattedEndDate}`,
+    url: url.toString(),
+    data: await espnFetch(url.toString(), { revalidate, noStore: revalidate <= 0 })
+  };
+}
+
 export async function getRawEspnNews() {
   return espnFetch(espnEndpoints.nbaNews, { revalidate: 300 });
 }

@@ -17,7 +17,11 @@ export const NBA_PLAYER_IMAGES: Record<string, string> = {
   "Stephen Curry": "https://a.espncdn.com/i/headshots/nba/players/full/3975.png",
   "Joel Embiid": "https://a.espncdn.com/i/headshots/nba/players/full/3059318.png",
   "Paolo Banchero": "https://a.espncdn.com/i/headshots/nba/players/full/4432573.png",
-  "Jaren Jackson Jr.": "https://a.espncdn.com/i/headshots/nba/players/full/4277961.png"
+  "Jaren Jackson Jr.": "https://a.espncdn.com/i/headshots/nba/players/full/4277961.png",
+  "LaMelo Ball": "https://a.espncdn.com/i/headshots/nba/players/full/4432816.png",
+  "LeBron James": "https://a.espncdn.com/i/headshots/nba/players/full/1966.png",
+  "Jayson Tatum": "https://a.espncdn.com/i/headshots/nba/players/full/4065648.png",
+  "Coby White": "https://a.espncdn.com/i/headshots/nba/players/full/4395651.png"
 };
 
 export function getPlayerImageUrl(playerName?: string, fallback?: string) {

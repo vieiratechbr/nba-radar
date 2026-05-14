@@ -157,6 +157,10 @@ O projeto possui páginas de:
 
 Essas páginas ajudam a preparar o projeto para uso público, deploy, autenticação de usuários e futura monetização.
 
+## Painel personalizado do time favorito
+
+A área `/perfil` funciona como uma central personalizada da franquia escolhida pelo usuário. Ela reúne próximos jogos, últimos resultados, forma recente, classificação, elenco principal, estatísticas do time, lendas e histórico da franquia, priorizando fontes online e sinalizando quando usa base local como fallback.
+
 ## Roadmap
 
 - Melhorar painel do usuário;
